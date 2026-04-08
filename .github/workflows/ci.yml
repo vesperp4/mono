@@ -5,6 +5,10 @@ on:
     branches: [main, dev]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     name: Typecheck & Build
@@ -26,9 +30,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
       - name: Commitlint
         if: github.event_name == 'pull_request' && github.base_ref != 'main'
         run: pnpm commitlint --from $(git merge-base HEAD origin/${{ github.base_ref }}) --to ${{ github.event.pull_request.head.sha }} --verbose
 
       - name: Lint, Typecheck & Build
         run: pnpm turbo lint typecheck build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          TURBO_CACHE_DIR: .turbo
