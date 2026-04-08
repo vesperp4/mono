@@ -1,0 +1,16 @@
+name: Protect Main
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-source-branch:
+    name: Source branch must be dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        if: github.head_ref != 'dev'
+        run: |
+          echo "PRs to main must come from dev. Current branch: ${{ github.head_ref }}"
+          exit 1
