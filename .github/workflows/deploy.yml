@@ -3,15 +3,11 @@ name: Deploy
 on:
   push:
     branches: [main, dev]
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
 
 jobs:
   deploy:
     name: Deploy to Azure Static Web Apps
     runs-on: ubuntu-latest
-    # Skip the build/deploy job on PR close — only the cleanup job runs
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
@@ -49,15 +45,3 @@ jobs:
           app_location: apps/web
           output_location: .next
           skip_app_build: true
-          skip_deploy_on_missing_secrets: true
-
-  close_pr:
-    name: Close PR preview
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    steps:
-      - name: Close staging preview
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: close
