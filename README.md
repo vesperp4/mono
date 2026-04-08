@@ -1,8 +1,8 @@
 # Vesper P4 — Website
 
-Official website for the [University Name] graduate CS/engineering chapter.
+Official website for the Vesper P4 graduate CS/engineering chapter at Polytechnic University of Puerto Rico.
 
-**Production** → [chapter.university.edu](https://chapter.university.edu)
+**Production** → [vesperp4.com](https://vesperp4.com)
 **Staging** → [dev--chapter.azurestaticapps.net](https://dev--chapter.azurestaticapps.net)
 
 ---
@@ -50,9 +50,10 @@ apps/
       types/        Shared TypeScript types + generated Sanity types
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
+  eslint-config/    Shared ESLint config
 infra/              Docker, scripts, and IaC (future)
 .github/
-  workflows/        CI — typecheck + build on push/PR
+  workflows/        CI/CD — lint, typecheck, build, deploy
 ```
 
 Full reference → [docs/project-structure.md](./docs/project-structure.md)
@@ -66,8 +67,8 @@ feat/* or fix/*  →  PR to dev  →  staging  →  PR to main  →  production
 ```
 
 - Branch off `dev`, never `main`
-- Every PR gets an automatic Azure preview URL
-- CI must pass (typecheck, build) before merge
+- PRs to `main` must come from `dev` only
+- CI must pass (lint, typecheck, build) before merge
 - 1 approval required on all PRs
 
 Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
@@ -97,7 +98,7 @@ Team roster, projects, and other dynamic content are managed through Sanity Stud
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) — includes setup, branch workflow,
-code standards, and the semester handoff protocol.
+code standards, and the quarterly handoff protocol.
 
 ---
 
