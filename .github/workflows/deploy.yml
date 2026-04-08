@@ -4,6 +4,10 @@ on:
   push:
     branches: [main, dev]
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy to Azure Static Web Apps
@@ -29,12 +33,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
       - name: Build
         run: pnpm turbo build
         env:
-          # Add any build-time env vars here, e.g.:
-          # NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           NEXT_TELEMETRY_DISABLED: 1
+          TURBO_CACHE_DIR: .turbo
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
