@@ -49,6 +49,7 @@ jobs:
           app_location: apps/web
           output_location: .next
           skip_app_build: true
+          skip_deploy_on_missing_secrets: true
 
   close_pr:
     name: Close PR preview
