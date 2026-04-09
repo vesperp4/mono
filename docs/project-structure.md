@@ -8,7 +8,7 @@ Full reference for the Vesper P4 monorepo layout.
 
 ```
 mono/
-├── apps/                   Deployable applications
+├── apps/                   Project-grouped deployable applications
 ├── packages/               Shared internal packages
 ├── infra/                  Infrastructure, scripts, IaC (future)
 ├── docs/                   Architecture and reference docs
@@ -23,12 +23,12 @@ mono/
 
 ---
 
-## apps/web
+## apps/website/web
 
 The main Next.js website.
 
 ```
-apps/web/
+apps/website/web/
 ├── src/
 │   ├── app/                Next.js App Router
 │   │   ├── layout.tsx      Root layout (html, body, global styles)
