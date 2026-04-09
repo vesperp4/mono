@@ -42,12 +42,13 @@ pnpm dev
 
 ```
 apps/
-  web/              Main website (Next.js)
-    src/
-      app/          App Router pages and layouts
-      components/   UI components (ui/, layout/, sections/, common/)
-      lib/          Sanity client, GROQ queries, utilities
-      types/        Shared TypeScript types + generated Sanity types
+  website/          Website project
+    web/            Main website (Next.js)
+      src/
+        app/        App Router pages and layouts
+        components/ UI components (ui/, layout/, sections/, common/)
+        lib/        Sanity client, GROQ queries, utilities
+        types/      Shared TypeScript types + generated Sanity types
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
   eslint-config/    Shared ESLint config
