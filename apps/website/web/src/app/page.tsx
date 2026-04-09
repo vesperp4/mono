@@ -1,8 +1,23 @@
-export default function Page() {
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import About from "@/components/About";
+import Pillars from "@/components/Pillars";
+import Founders from "@/components/Founders";
+import MissionVision from "@/components/MissionVision";
+import Join from "@/components/Join";
+import Footer from "@/components/Footer";
+
+export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-4xl font-bold">Chapter</h1>
-      <p className="text-gray-500">Graduate CS/Engineering Chapter</p>
+    <main style={{ background: "#020304" }}>
+      <Navbar />
+      <Hero />
+      <About />
+      <Pillars />
+      <Founders />
+      <MissionVision />
+      <Join />
+      <Footer />
     </main>
   );
 }
