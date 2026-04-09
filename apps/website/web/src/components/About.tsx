@@ -144,7 +144,7 @@ export default function About() {
 
             {/* Pillar list */}
             <div className="flex flex-col gap-3">
-              {pillars.map((pillar, i) => (
+              {pillars.map((pillar, _i) => (
                 <motion.div
                   key={pillar.name}
                   variants={item}
