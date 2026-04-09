@@ -104,12 +104,12 @@ export default function Founders() {
                 background: "rgba(10,12,16,0.8)",
                 border: `1px solid ${founder.color}30`,
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
                 (e.currentTarget as HTMLDivElement).style.boxShadow =
                   `0 0 30px ${founder.color}25, 0 0 60px ${founder.color}10`;
                 (e.currentTarget as HTMLDivElement).style.borderColor = `${founder.color}60`;
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
                 (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
                 (e.currentTarget as HTMLDivElement).style.borderColor = `${founder.color}30`;
               }}

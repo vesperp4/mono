@@ -170,11 +170,11 @@ function PillarCard({
         border: `1px solid ${pillar.borderColor}`,
         transition: "box-shadow 0.4s ease",
       }}
-      onMouseEnter={(e) => {
+      onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
         (e.currentTarget as HTMLDivElement).style.boxShadow =
           `0 0 40px ${pillar.glowColor}, 0 0 80px ${pillar.glowColor.replace("0.25", "0.1")}`;
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
         (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
       }}
     >

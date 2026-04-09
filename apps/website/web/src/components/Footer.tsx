@@ -119,8 +119,8 @@ export default function Footer() {
                       href={link.href}
                       className="text-sm transition-colors duration-200"
                       style={{ fontFamily: "var(--font-syne)", color: "rgba(240,242,245,0.5)" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = "#f0f2f5")}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(240,242,245,0.5)")}
+                      onMouseEnter={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "#f0f2f5")}
+                      onMouseLeave={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "rgba(240,242,245,0.5)")}
                     >
                       {link.label}
                     </a>
@@ -166,8 +166,8 @@ export default function Footer() {
               href="mailto:vesperp4@pupr.edu"
               className="text-sm transition-colors duration-200 block mb-6"
               style={{ fontFamily: "var(--font-mono)", color: "#2563eb" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#93b4ff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#2563eb")}
+              onMouseEnter={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "#93b4ff")}
+              onMouseLeave={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "#2563eb")}
             >
               vesperp4@pupr.edu
             </a>
@@ -185,11 +185,11 @@ export default function Footer() {
                     color: "rgba(240,242,245,0.5)",
                   }}
                   aria-label={s.name}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
                     e.currentTarget.style.color = "#f0f2f5";
                     e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
                     e.currentTarget.style.color = "rgba(240,242,245,0.5)";
                     e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
                   }}

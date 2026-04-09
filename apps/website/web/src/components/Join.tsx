@@ -122,11 +122,11 @@ export default function Join() {
                 background: "rgba(10,12,16,0.8)",
                 border: `1px solid ${item.color}25`,
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor = `${item.color}50`;
                 (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 30px ${item.color}15`;
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor = `${item.color}25`;
                 (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
               }}
@@ -173,8 +173,8 @@ export default function Join() {
                 href="mailto:vesperp4@pupr.edu"
                 className="text-sm font-medium transition-colors duration-200"
                 style={{ fontFamily: "var(--font-mono)", color: "#2563eb" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#93b4ff")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#2563eb")}
+                onMouseEnter={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "#93b4ff")}
+                onMouseLeave={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "#2563eb")}
               >
                 vesperp4@pupr.edu
               </a>
