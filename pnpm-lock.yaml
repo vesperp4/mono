@@ -24,7 +24,7 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
 
-  apps/web:
+  apps/website/web:
     dependencies:
       next:
         specifier: ^16.2.2
@@ -38,10 +38,10 @@ importers:
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../../packages/eslint-config
+        version: link:../../../packages/eslint-config
       '@repo/tsconfig':
         specifier: workspace:*
-        version: link:../../packages/tsconfig
+        version: link:../../../packages/tsconfig
       '@tailwindcss/postcss':
         specifier: ^4.1.4
         version: 4.2.2
