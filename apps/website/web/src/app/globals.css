@@ -1,1 +1,128 @@
 @import "tailwindcss";
+
+/* ─── Custom Theme Tokens ──────────────────────────────── */
+@theme {
+  --color-background: #020304;
+  --color-surface: #0a0c10;
+  --color-surface-2: #0f1218;
+  --color-border: rgba(255,255,255,0.08);
+
+  --color-azure: #2563eb;
+  --color-azure-glow: rgba(37,99,235,0.35);
+  --color-crimson: #dc2626;
+  --color-crimson-glow: rgba(220,38,38,0.35);
+  --color-jade: #16a34a;
+  --color-jade-glow: rgba(22,163,74,0.35);
+  --color-amethyst: #7c3aed;
+  --color-amethyst-glow: rgba(124,58,237,0.35);
+
+  --color-text-primary: #f0f2f5;
+  --color-text-secondary: rgba(240,242,245,0.6);
+  --color-text-muted: rgba(240,242,245,0.35);
+
+  --font-orbitron: "Orbitron", sans-serif;
+  --font-syne: "Syne", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* ─── CSS Variables ────────────────────────────────────── */
+:root {
+  --bg: #020304;
+  --surface: #0a0c10;
+  --surface-2: #0f1218;
+  --border: rgba(255,255,255,0.08);
+  --azure: #2563eb;
+  --crimson: #dc2626;
+  --jade: #16a34a;
+  --amethyst: #7c3aed;
+  --text: #f0f2f5;
+  --text-muted: rgba(240,242,245,0.55);
+}
+
+/* ─── Base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Syne", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── Scanlines overlay ────────────────────────────────── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanline-drift 8s linear infinite;
+}
+
+@keyframes scanline-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 200px; }
+}
+
+/* ─── Angular clip-path button ─────────────────────────── */
+.btn-angular {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: all 0.3s ease;
+}
+.btn-angular:hover {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+/* ─── Pillar card clip ─────────────────────────────────── */
+.card-angular {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+/* ─── Scrollbar ────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* ─── Star pulse ───────────────────────────────────────── */
+@keyframes star-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+.star-pulse { animation: star-pulse 3s ease-in-out infinite; }
+
+/* ─── Dot grid ─────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Glow helpers ─────────────────────────────────────── */
+.glow-azure    { box-shadow: 0 0 30px rgba(37,99,235,0.25),  0 0 60px rgba(37,99,235,0.1); }
+.glow-crimson  { box-shadow: 0 0 30px rgba(220,38,38,0.25),  0 0 60px rgba(220,38,38,0.1); }
+.glow-jade     { box-shadow: 0 0 30px rgba(22,163,74,0.25),  0 0 60px rgba(22,163,74,0.1); }
+.glow-amethyst { box-shadow: 0 0 30px rgba(124,58,237,0.25), 0 0 60px rgba(124,58,237,0.1); }
+
+/* ─── Section spacing ──────────────────────────────────── */
+.section { padding: 6rem 0; }
+@media (max-width: 768px) { .section { padding: 4rem 0; } }
+
+/* ─── Container ────────────────────────────────────────── */
+.container-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+@media (max-width: 640px) { .container-main { padding: 0 1rem; } }
