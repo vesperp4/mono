@@ -1,5 +1,6 @@
 import tseslint from "typescript-eslint";
 import nextConfig from "eslint-config-next";
+import prettierConfig from "eslint-config-prettier";
 
 export default [
   ...nextConfig,
@@ -13,4 +14,5 @@ export default [
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
+  prettierConfig,
 ];

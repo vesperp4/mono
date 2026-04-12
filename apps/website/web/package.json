@@ -7,7 +7,9 @@
     "dev": "next dev --turbopack",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "format-check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "framer-motion": "^12.38.0",
