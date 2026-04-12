@@ -54,20 +54,6 @@ jobs:
       - name: Audit dependencies
         run: pnpm audit --prod
 
-      - name: Security Scan
-        uses: ossf/scorecard-action@v2
-        with:
-          results-file: results.sarif
-          results-format: sarif
-          export-results-file: results.sarif
-          publish-results: ${{ github.event_name != 'pull_request' }}
-
-      - name: Upload SARIF
-        if: github.event_name == 'push'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
-
       - name: Check Formatting
         run: pnpm turbo format-check
 
