@@ -1,3 +1,3 @@
-import config from "@repo/eslint-config/next";
+import config from '@repo/eslint-config/next'
 
-export default config;
+export default config

@@ -5,12 +5,16 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "format": "turbo format --continue",
+    "format-check": "turbo format-check",
     "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "husky": "^9.1.7",
+    "prettier": "^3.5.3",
     "turbo": "^2.9.5",
     "typescript": "^6.0.2"
   },

@@ -56,18 +56,19 @@ This repo enforces [Conventional Commits](https://www.conventionalcommits.org/).
 type(scope): short description
 ```
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature or page |
-| `fix` | Bug fix |
-| `chore` | Dependency updates, config changes |
-| `docs` | Documentation only |
-| `style` | Formatting, no logic change |
+| Type       | When to use                          |
+| ---------- | ------------------------------------ |
+| `feat`     | New feature or page                  |
+| `fix`      | Bug fix                              |
+| `chore`    | Dependency updates, config changes   |
+| `docs`     | Documentation only                   |
+| `style`    | Formatting, no logic change          |
 | `refactor` | Code restructure, no behavior change |
-| `ci` | CI/CD workflow changes |
-| `build` | Build system changes |
+| `ci`       | CI/CD workflow changes               |
+| `build`    | Build system changes                 |
 
 Examples:
+
 ```
 feat: add team page
 fix(web): correct broken nav link on mobile
@@ -89,12 +90,13 @@ docs: add setup instructions to CONTRIBUTING
 
 Every PR must pass before merging:
 
-| Check | What it runs |
-|-------|-------------|
-| Lint | `pnpm turbo lint` |
-| Typecheck | `pnpm turbo typecheck` |
-| Build | `pnpm turbo build` |
-| Commitlint | Validates all commit messages in the PR |
+| Check         | What it runs                                |
+| ------------- | ------------------------------------------- |
+| Lint          | `pnpm turbo lint`                           |
+| Typecheck     | `pnpm turbo typecheck`                      |
+| Format Check  | `pnpm turbo format-check`                   |
+| Build         | `pnpm turbo build`                          |
+| Commitlint    | Validates all commit messages in the PR     |
 | Source branch | Rejects PRs to `main` not coming from `dev` |
 
 ---

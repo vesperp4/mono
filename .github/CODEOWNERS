@@ -1,0 +1,18 @@
+# Code ownership
+# Add yourself here as a maintainer
+
+# Default owner for everything
+* @vesperp4/tech-lead
+
+# CI/CD
+/.github/ @vesperp4/tech-lead
+
+# Infrastructure
+/infra/ @vesperp4/tech-lead
+
+# Website app
+/apps/website/ @vesperp4/tech-lead
+
+# Shared packages
+/packages/eslint-config/ @vesperp4/tech-lead
+/packages/tsconfig/ @vesperp4/tech-lead
