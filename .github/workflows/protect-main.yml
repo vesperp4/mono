@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [main]
 
+permissions: read-all
+
 jobs:
   check-source-branch:
     name: Source branch must be dev
@@ -11,6 +13,8 @@ jobs:
     steps:
       - name: Check source branch
         if: github.head_ref != 'dev'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          echo "PRs to main must come from dev. Current branch: ${{ github.head_ref }}"
+          echo "PRs to main must come from dev. Current branch: $HEAD_REF"
           exit 1
