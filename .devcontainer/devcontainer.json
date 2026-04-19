@@ -6,7 +6,11 @@
   },
   "remoteUser": "vscode",
   "containerUser": "vscode",
-  "postCreateCommand": "scripts/setup",
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local && scripts/setup",
+  "mounts": [
+    "source=mise-data,target=/home/vscode/.local/share/mise,type=volume",
+    "source=mise-state,target=/home/vscode/.local/state/mise,type=volume"
+  ],
   "forwardPorts": [3000],
   "customizations": {
     "vscode": {

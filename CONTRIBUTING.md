@@ -57,6 +57,8 @@ pnpm dev
 
 The `pnpm install` step also sets up Git hooks via Husky automatically.
 
+> **Note:** Mise downloads tools from GitHub releases, which are rate-limited. If you rebuild containers frequently and hit rate limits, set a `GITHUB_TOKEN` environment variable with a personal access token (no permissions needed).
+
 ---
 
 ## Personalizing the Devcontainer
