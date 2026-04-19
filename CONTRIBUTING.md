@@ -199,6 +199,13 @@ git pull origin dev
 git checkout -b feat/your-feature-name
 ```
 
+### Merge strategy
+
+| Target branch | Merge method         | Why                                              |
+| ------------- | -------------------- | ------------------------------------------------ |
+| `dev`         | Squash and merge     | Keeps history clean — one commit per feature/fix |
+| `main`        | Rebase and merge     | Keeps `dev` and `main` in sync, linear history   |
+
 ---
 
 ## Commit Messages
