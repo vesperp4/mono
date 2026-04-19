@@ -6,17 +6,49 @@ This guide covers everything you need to contribute to the Vesper P4 website —
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v20+
-- [pnpm](https://pnpm.io/) v10+ — `npm install -g pnpm`
 - [Git](https://git-scm.com/)
+- [Docker](https://docs.docker.com/get-docker/) (for devcontainer setup)
+- [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers), or [DevPod](https://devpod.sh/)
 
 ---
 
 ## Setup
 
+### Option A: Devcontainer (recommended)
+
+The devcontainer provides a fully configured environment with Node.js, pnpm, and Turbo — no local setup needed.
+
+**VS Code:**
+
+1. Clone the repo and open it in VS Code
+2. When prompted, click "Reopen in Container" (or run `Dev Containers: Reopen in Container` from the command palette)
+3. Wait for the container to build and `scripts/setup` to finish
+4. Run `pnpm install` then `pnpm dev`
+
+**DevPod:**
+
 ```bash
+devpod up /path/to/mono
+ssh mono.devpod
+pnpm install
+pnpm dev
+```
+
+### Option B: Local setup with mise
+
+If you prefer working outside a container, use [mise](https://mise.jdx.dev) to install the correct tool versions.
+
+```bash
+# Install mise
+curl https://mise.run | sh
+
+# Activate mise in your shell (add to .bashrc or .zshrc)
+eval "$(mise activate bash)"  # or zsh
+
+# Clone and setup
 git clone https://github.com/vesperp4/mono.git
 cd mono
+mise trust && mise install
 pnpm install
 pnpm dev
 ```
@@ -24,6 +56,125 @@ pnpm dev
 → App: [http://localhost:3000](http://localhost:3000)
 
 The `pnpm install` step also sets up Git hooks via Husky automatically.
+
+---
+
+## Personalizing the Devcontainer
+
+You can bring your own dotfiles, shell config, and personal tools into the devcontainer without affecting the project.
+
+**VS Code** — set your dotfiles repo in user settings:
+
+```json
+{
+  "dotfiles.repository": "github.com/your-username/dotfiles",
+  "dotfiles.installCommand": "install.sh"
+}
+```
+
+**DevPod** — pass your dotfiles repo as a flag:
+
+```bash
+devpod up /path/to/mono --dotfiles https://github.com/your-username/dotfiles --dotfiles-script install.sh
+```
+
+For personal tools (e.g. neovim, ripgrep), add them to a global mise config in your dotfiles at `~/.config/mise/config.toml`:
+
+```toml
+[tools]
+neovim = "latest"
+ripgrep = "latest"
+```
+
+Mise installs these from prebuilt binaries — no package manager needed, works on any base image.
+
+### Creating a Dotfiles Repo
+
+If you don't have a dotfiles repo yet, here's how to set one up.
+
+**1. Create the repo:**
+
+```bash
+mkdir ~/dotfiles && cd ~/dotfiles
+git init
+```
+
+**2. Add a global mise config for your personal tools:**
+
+```bash
+mkdir -p .config/mise
+```
+
+Create `.config/mise/config.toml`:
+
+```toml
+[tools]
+neovim = "latest"
+# Add any other tools you want: ripgrep, fzf, lazygit, etc.
+```
+
+**3. Add an install script:**
+
+Create `install.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Copy mise config to home
+mkdir -p ~/.config/mise
+cp .config/mise/config.toml ~/.config/mise/config.toml
+
+# Install personal tools
+mise install
+```
+
+Make it executable:
+
+```bash
+chmod +x install.sh
+```
+
+**4. Push it to GitHub:**
+
+```bash
+git add -A
+git commit -m "initial dotfiles"
+git remote add origin https://github.com/your-username/dotfiles.git
+git push -u origin main
+```
+
+**5. (Optional) Use chezmoi for managing dotfiles:**
+
+As your dotfiles grow, [chezmoi](https://www.chezmoi.io/) helps manage them across machines and containers. It handles templating, secrets, and keeps your home directory in sync with your repo.
+
+To get started with chezmoi:
+
+```bash
+# Install chezmoi
+sh -c "$(curl -fsLS get.chezmoi.io)"
+
+# Initialize from your dotfiles repo
+chezmoi init https://github.com/your-username/dotfiles.git
+
+# Add files to chezmoi's management
+chezmoi add ~/.config/mise/config.toml
+
+# Apply your dotfiles
+chezmoi apply
+```
+
+Your `install.sh` then becomes:
+
+```bash
+#!/bin/bash
+set -e
+
+mkdir -p ~/.local/bin
+curl -fsLS get.chezmoi.io -o /tmp/chezmoi-install.sh
+sh /tmp/chezmoi-install.sh -b ~/.local/bin init --apply your-username
+mise install
+```
 
 ---
 
