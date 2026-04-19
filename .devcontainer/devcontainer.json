@@ -1,7 +1,6 @@
 {
   "name": "Mono Dev",
   "build": {
-    "context": "..",
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
