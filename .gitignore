@@ -21,3 +21,7 @@ dist/
 # debug
 npm-debug.log*
 pnpm-debug.log*
+
+# devpod
+.devpod-internal/
+.pnpm-store/
