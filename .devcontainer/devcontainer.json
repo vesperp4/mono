@@ -1,14 +1,13 @@
 {
   "name": "Mono Dev",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "22"
-    }
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
   "containerUser": "vscode",
-  "postCreateCommand": "bash -i -c 'corepack enable && corepack prepare --activate && pnpm install && npm install -g turbo'",
+  "postCreateCommand": "scripts/setup",
+  "forwardPorts": [3000],
   "customizations": {
     "vscode": {
       "extensions": [
