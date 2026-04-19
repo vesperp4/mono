@@ -7,6 +7,9 @@
   "remoteUser": "vscode",
   "containerUser": "vscode",
   "postCreateCommand": "scripts/setup",
+  "mounts": [
+    "source=mise-cache,target=/home/vscode/.local/share/mise,type=volume"
+  ],
   "forwardPorts": [3000],
   "customizations": {
     "vscode": {
