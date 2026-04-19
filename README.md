@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/vesperp4/mono/actions/workflows/ci.yml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/ci.yml)
 [![Deploy](https://github.com/vesperp4/mono/actions/workflows/deploy.yml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/deploy.yml)
-[![OpenSSF Scorecard](https://github.com/vesperp4/mono/actions/workflows/ci.yml/badge.svg?query=branch:main)](https://securityscorecard.dev lookup/vesperp4/mono)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/vesperp4/mono/badge)](https://scorecard.dev/viewer/?uri=github.com/vesperp4/mono)
 
 Official website for the Vesper P4 graduate CS/engineering chapter at Polytechnic University of Puerto Rico.
 
