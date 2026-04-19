@@ -204,7 +204,7 @@ git checkout -b feat/your-feature-name
 | Target branch | Merge method         | Why                                              |
 | ------------- | -------------------- | ------------------------------------------------ |
 | `dev`         | Squash and merge     | Keeps history clean — one commit per feature/fix |
-| `main`        | Rebase and merge     | Keeps `dev` and `main` in sync, linear history   |
+| `main`        | Create a merge commit| Clear record of when dev was promoted to production |
 
 ---
 
