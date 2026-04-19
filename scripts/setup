@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 
-mise trust ./mise.toml
-mise install
+/usr/local/bin/mise trust ./mise.toml
+/usr/local/bin/mise install
