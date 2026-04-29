@@ -13,19 +13,19 @@
   },
   "dependencies": {
     "framer-motion": "^12.38.0",
-    "next": "^16.2.2",
+    "next": "^16.2.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/tsconfig": "workspace:*",
-    "@tailwindcss/postcss": "^4.1.4",
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^25.5.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^9.39.4",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^6.0.2"
+    "eslint": "^10.2.1",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
   }
 }
