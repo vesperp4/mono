@@ -9,6 +9,11 @@ updates:
       dependencies:
         patterns:
           - "*"
+    ignore:
+      # ESLint 10 requires scopeManager.addGlobals(); typescript-eslint and
+      # eslint-config-next don't yet implement it. Pin to v9 until they do.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
