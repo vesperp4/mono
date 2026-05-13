@@ -7,7 +7,6 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
-  axes: ["wght"],
 });
 
 const anybody = Anybody({
@@ -30,8 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${anybody.variable} h-full scroll-smooth`}>
       <body className="min-h-full antialiased font-[family-name:var(--font-inter)]">
-          <ConvexClientProvider>{children}</ConvexClientProvider>
-        </body>
+        <ConvexClientProvider>{children}</ConvexClientProvider>
+      </body>
     </html>
   );
 }
