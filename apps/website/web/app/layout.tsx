@@ -11,7 +11,7 @@ const inter = Inter({
 
 const anybody = Anybody({
   subsets: ["latin"],
-  axes: ["wght", "wdth"],
+  axes: ["wdth"],
   variable: "--font-anybody",
 });
 
