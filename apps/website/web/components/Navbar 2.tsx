@@ -11,6 +11,7 @@ const links = [
   { label: "Stars", href: "#stars" },
   { label: "Mission", href: "#mission" },
   { label: "Leadership", href: "#leadership" },
+  { label: "Join", href: "#join" },
 ];
 
 export default function Navbar() {

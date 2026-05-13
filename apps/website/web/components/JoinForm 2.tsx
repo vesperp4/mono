@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
 import SectionTitle from "./SectionTitle";
 
 interface FormData {
@@ -21,6 +23,8 @@ const EMPTY_FORM: FormData = {
 };
 
 export default function JoinForm() {
+  const submitApplication = useMutation(api.applications.submitApplication);
+
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +45,7 @@ export default function JoinForm() {
 
     setLoading(true);
     try {
-      console.log(form);
+      await submitApplication(form);
       setSubmitted(true);
       setForm(EMPTY_FORM);
     } catch {

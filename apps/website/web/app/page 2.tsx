@@ -7,6 +7,7 @@ import StarsFounders from "@/components/StarsFounders";
 import MissionVision from "@/components/MissionVision";
 import ObjectivesList from "@/components/ObjectivesList";
 import LeadershipSection from "@/components/LeadershipSection";
+import JoinForm from "@/components/JoinForm";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
       <MissionVision />
       <ObjectivesList />
       <LeadershipSection />
+      <JoinForm />
       <Footer />
     </main>
   );
