@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
           version: 10.33.0
 
@@ -28,15 +28,6 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-
-      - name: Cache node_modules
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        id: node-cache
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
 
       - name: Cache Turbo
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -46,7 +37,6 @@ jobs:
           restore-keys: turbo-${{ runner.os }}-
 
       - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Commitlint
