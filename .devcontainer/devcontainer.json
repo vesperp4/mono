@@ -18,7 +18,6 @@
         "esbenp.prettier-vscode",
         "bradlc.vscode-tailwindcss",
         "ms-azuretools.vscode-bicep",
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
         "redhat.vscode-yaml"
       ],
       "settings": {

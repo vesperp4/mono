@@ -10,14 +10,4 @@ python = "3.12"
 pipx = "1.12.0"
 
 # Azure tooling — for IaC deploys (see iac/azure/README.md).
-"azure" = "2.86.0"            # Azure CLI (`az`), installed via pipx
-"azure-kubelogin" = "0.2.17"  # Entra ID auth plugin for kubectl
-
-# Kubernetes tooling — for operating the AKS cluster (see gitops/README.md).
-kubectl = "1.36.1"
-helm = "4.2.0"
-flux2 = "2.8.8"
-
-# Cilium CLI — for installing and managing the cluster's CNI.
-# See gitops/bootstrap/cilium.md for usage.
-"cilium-cli" = "0.19.4"
+"azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
