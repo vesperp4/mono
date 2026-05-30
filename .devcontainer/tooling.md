@@ -15,6 +15,7 @@ The mise approach (single source of truth via `mise.toml`, no `RUN` lines in the
 | `azure` (Azure CLI, `az`) | 2.86.0 | Drive Azure-side IaC (`az deployment sub create`, `az staticwebapp secrets list`). Installed via mise's `pipx:` backend. | <https://github.com/Azure/azure-cli/releases> |
 | `pre-commit` | latest | Git hook runner. Drives [`.pre-commit-config.yaml`](../.pre-commit-config.yaml). Installed via mise's `aqua:pre-commit/pre-commit` backend — ships as a Python zipapp (`.pyz`), so it relies on the mise-pinned `python`. | <https://github.com/pre-commit/pre-commit/releases> |
 | `commitizen` | latest | Authors conventional commits (`cz commit`) and validates messages via its pre-commit hook (replaces commitlint). Installed via mise's `pipx:` backend. | <https://github.com/commitizen-tools/commitizen/releases> |
+| `gh` (GitHub CLI) | latest | PR/issue management and `gh`-driven scripting (`gh pr view`, `gh pr create`, `gh api`) from the terminal. Installed via mise's `aqua:cli/cli` backend — single binary. | <https://github.com/cli/cli/releases> |
 
 ---
 
@@ -37,11 +38,12 @@ Two reasons:
 1. **Quarterly Tech Lead handoff.** A new contributor opens the devcontainer and gets the same toolchain the previous Tech Lead had. If `latest` pulls a breaking release the day they onboard, the first hour is debugging tools instead of learning.
 2. **Reproducible runbooks.** When [`iac/azure/README.md`](../iac/azure/README.md) says "run `az ...`," the exact CLI behavior should match what's documented.
 
-Three outliers use `latest`:
+Four outliers use `latest`:
 
 - `turbo = "latest"` — predates this convention.
 - `pre-commit = "latest"` — chosen deliberately; the hook framework is low-risk to bump and changes don't affect deploy or runtime behavior.
 - `pipx:commitizen = "latest"` — same reasoning as pre-commit; bumps are isolated to commit-authoring/validation flow.
+- `gh = "latest"` — gh's command surface is stable; opportunistic bumps are low-risk for dev-loop use.
 
 Mise rule of thumb in this repo: anything used to operate live infrastructure (IaC) is pinned; commit-time and dev-loop tooling can be looser.
 
@@ -53,7 +55,7 @@ Each quarter (per [CONTRIBUTING.md](../CONTRIBUTING.md)'s handoff protocol), the
 
 1. **Checks the upstream release pages** (linked in the table above). Note any breaking changes called out in release notes.
 2. **Bumps the pin in [`mise.toml`](../mise.toml)** and runs `mise install` locally.
-3. **Smoke-tests** by running `az version`, `pre-commit --version`, and `cz version`.
+3. **Smoke-tests** by running `az version`, `pre-commit --version`, `cz version`, and `gh --version`.
 4. **PR the change** as `chore(devcontainer): bump <tool> to <version>` so the diff is clean and reviewable.
 
 For pre-commit's own hook revs (in [`.pre-commit-config.yaml`](../.pre-commit-config.yaml)), run `pre-commit autoupdate` to bump them; commit the result alongside the mise.toml bump.
