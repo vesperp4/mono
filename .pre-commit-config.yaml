@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.16.3
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: pnpm turbo lint
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
