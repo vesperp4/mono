@@ -12,13 +12,12 @@ mono/
 ├── packages/               Shared internal packages
 ├── infra/                  Infrastructure, scripts, IaC (future)
 ├── docs/                   Architecture and reference docs
-├── .github/workflows/      GitHub Actions CI/CD
-├── .husky/                 Git hooks
-├── package.json            Root workspace — shared devDeps, scripts
-├── pnpm-workspace.yaml     pnpm workspace config
-├── turbo.json              Turborepo task graph
-├── commitlint.config.mjs   Conventional commits config
-└── tsconfig.json           Root TypeScript project references
+├── .github/workflows/       GitHub Actions CI/CD
+├── .pre-commit-config.yaml  Pre-commit hooks (lint, conventional commits)
+├── package.json             Root workspace — shared devDeps, scripts
+├── pnpm-workspace.yaml      pnpm workspace config
+├── turbo.json               Turborepo task graph
+└── tsconfig.json            Root TypeScript project references
 ```
 
 ---

@@ -6,16 +6,21 @@ turbo = "latest"
 # GitHub CLI — PR/issue management and gh-driven scripting from the terminal.
 gh = "latest"
 
-# Commit-time tooling — pre-commit drives `.pre-commit-config.yaml`; commitizen
-# authors conventional commits and validates messages via its pre-commit hook.
+# Pre-commit framework — drives `.pre-commit-config.yaml`.
 pre-commit = "latest"
-"pipx:commitizen" = "latest"
 
 # Python + pipx — runtime for pre-commit (Python zipapp) and the venv backend
-# pipx uses to install Python apps (Azure CLI, commitizen).
+# pipx uses to install Python apps (Azure CLI; commitizen via scripts/setup_project).
 # See .devcontainer/tooling.md.
 python = "3.12"
 pipx = "1.12.0"
 
 # Azure tooling — for IaC deploys (see iac/azure/README.md).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
+
+[settings]
+# Required for [hooks] below.
+experimental = true
+
+[hooks]
+enter = "bash ./scripts/setup_project"

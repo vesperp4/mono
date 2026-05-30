@@ -10,7 +10,7 @@ Reference for the Vesper P4 CI/CD pipeline — GitHub Actions + Azure Static Web
 feat/* or fix/*
     │
     ▼
-PR to dev ──► CI runs (lint, typecheck, build, commitlint)
+PR to dev ──► CI runs (lint, typecheck, build, commit messages)
     │
     ▼ (merge)
 dev branch ──► Deploy to staging (vesperp4-staging.azurestaticapps.net)
@@ -30,7 +30,7 @@ main branch ──► Deploy to production (vesperp4.com)
 
 | Step | Command |
 |------|---------|
-| Commitlint | Validates all commit messages in the PR |
+| Check commit messages | `cz check` validates all commit messages in the PR |
 | Lint | `pnpm turbo lint` |
 | Typecheck | `pnpm turbo typecheck` |
 | Build | `pnpm turbo build` |
