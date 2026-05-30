@@ -55,7 +55,7 @@ pnpm dev
 
 → App: [http://localhost:3000](http://localhost:3000)
 
-The `pnpm install` step also sets up Git hooks via Husky automatically.
+Devpod users get Git hooks wired automatically — the mise `enter` hook runs `scripts/setup_project` the first time you `cd` into the project. Local mise users activate them once with `pre-commit install --hook-type pre-commit --hook-type commit-msg`.
 
 > **Note:** Mise downloads tools from GitHub releases, which are rate-limited. If you rebuild containers frequently and hit rate limits, set a `GITHUB_TOKEN` environment variable with a personal access token (no permissions needed).
 
@@ -256,7 +256,7 @@ Every PR must pass before merging:
 | Typecheck     | `pnpm turbo typecheck`                      |
 | Format Check  | `pnpm turbo format-check`                   |
 | Build         | `pnpm turbo build`                          |
-| Commitlint    | Validates all commit messages in the PR     |
+| Commit messages | `cz check` validates all commit messages in the PR |
 | Source branch | Rejects PRs to `main` not coming from `dev` |
 
 ---

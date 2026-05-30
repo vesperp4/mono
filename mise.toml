@@ -3,11 +3,24 @@ node = "22"
 pnpm = "10.33.0"
 turbo = "latest"
 
-# Python + pipx — pipx provides the backend mise uses to install the Azure CLI.
-# python brings the interpreter pipx needs to run installed apps.
+# GitHub CLI — PR/issue management and gh-driven scripting from the terminal.
+gh = "latest"
+
+# Pre-commit framework — drives `.pre-commit-config.yaml`.
+pre-commit = "latest"
+
+# Python + pipx — runtime for pre-commit (Python zipapp) and the venv backend
+# pipx uses to install Python apps (Azure CLI; commitizen via scripts/setup_project).
 # See .devcontainer/tooling.md.
 python = "3.12"
 pipx = "1.12.0"
 
 # Azure tooling — for IaC deploys (see iac/azure/README.md).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
+
+[settings]
+# Required for [hooks] below.
+experimental = true
+
+[hooks]
+enter = "bash ./scripts/setup_project"
