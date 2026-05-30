@@ -3,6 +3,9 @@ node = "22"
 pnpm = "10.33.0"
 turbo = "latest"
 
+# GitHub CLI — PR/issue management and gh-driven scripting from the terminal.
+gh = "latest"
+
 # Commit-time tooling — pre-commit drives `.pre-commit-config.yaml`; commitizen
 # authors conventional commits and validates messages via its pre-commit hook.
 pre-commit = "latest"
