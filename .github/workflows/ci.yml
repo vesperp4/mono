@@ -39,9 +39,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Commitlint
+      - name: Check commit messages
         if: github.event_name == 'pull_request' && github.base_ref != 'main'
-        run: pnpm commitlint --from $(git merge-base HEAD origin/${{ github.base_ref }}) --to ${{ github.event.pull_request.head.sha }} --verbose
+        run: |
+          pipx install commitizen
+          cz check --rev-range $(git merge-base HEAD origin/${{ github.base_ref }})..${{ github.event.pull_request.head.sha }}
 
       - name: Audit dependencies
         run: pnpm audit --prod
