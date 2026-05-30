@@ -3,8 +3,13 @@ node = "22"
 pnpm = "10.33.0"
 turbo = "latest"
 
-# Python + pipx — pipx provides the backend mise uses to install the Azure CLI.
-# python brings the interpreter pipx needs to run installed apps.
+# Commit-time tooling — pre-commit drives `.pre-commit-config.yaml`; commitizen
+# authors conventional commits and validates messages via its pre-commit hook.
+pre-commit = "latest"
+"pipx:commitizen" = "latest"
+
+# Python + pipx — runtime for pre-commit (Python zipapp) and the venv backend
+# pipx uses to install Python apps (Azure CLI, commitizen).
 # See .devcontainer/tooling.md.
 python = "3.12"
 pipx = "1.12.0"
