@@ -5,11 +5,29 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
   - repo: local
     hooks:
       - id: lint
         name: lint
         entry: pnpm turbo lint
         language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: bash -c 'cd apps/website/api && cargo fmt --all -- --check'
+        language: system
+        files: ^apps/website/api/.*\.rs$
         pass_filenames: false
         stages: [pre-commit]

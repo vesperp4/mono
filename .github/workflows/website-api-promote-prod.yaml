@@ -1,0 +1,56 @@
+name: Website API Promote Prod
+
+# Manually promotes the currently-deployed dev image tag to prod. The `production`
+# environment gate requires reviewer approval before the tag is resolved.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    environment: production # required-reviewer approval gate
+    outputs:
+      tag: ${{ steps.read.outputs.tag }}
+    steps:
+      - name: Mint infra-repo app token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.INFRA_APP_ID }}
+          private-key: ${{ secrets.INFRA_APP_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ vars.INFRA_REPO_NAME }}
+
+      - name: Checkout infra repo
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ github.repository_owner }}/${{ vars.INFRA_REPO_NAME }}
+          token: ${{ steps.app-token.outputs.token }}
+          path: infra
+          persist-credentials: false
+
+      - name: Checkout this repo (for CI scripts)
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          path: actions-repo
+
+      - name: Read deployed dev tag
+        id: read
+        run: |
+          tag="$(bash actions-repo/scripts/ci/read-bicepparam-tag.sh infra/env/dev/vesperp4-api.bicepparam)"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+  promote:
+    needs: resolve
+    uses: ./.github/workflows/_update-infra.yaml
+    with:
+      image: vesperp4-api
+      tag: ${{ needs.resolve.outputs.tag }}
+      environment: prod
+      auto_merge: false
+    secrets:
+      infra_app_id: ${{ secrets.INFRA_APP_ID }}
+      infra_app_key: ${{ secrets.INFRA_APP_KEY }}
