@@ -16,10 +16,18 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
+      # Mint a GitHub App token (shared vesperp4-ci-bot app). Using an App token
+      # rather than GITHUB_TOKEN lets the release tag push trigger the Website
+      # API Build workflow — GITHUB_TOKEN-pushed tags do not start workflows.
+      - name: Mint app token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.INFRA_APP_ID }}
+          private-key: ${{ secrets.INFRA_APP_KEY }}
+
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
-          # Use a PAT or GitHub App token (not GITHUB_TOKEN) so that the release
-          # tag push triggers the Website API Build workflow.
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
