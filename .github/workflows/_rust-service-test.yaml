@@ -1,0 +1,94 @@
+name: Rust Service Tests
+
+# Reusable quality gate for a Rust service: format, lint, security audits,
+# tests against a real Postgres, coverage, and a container vulnerability scan.
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Path to the service crate
+        type: string
+        required: true
+      package:
+        description: Crate/image name used for artifacts and the scan tag
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vesperp4
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/vesperp4
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      # rust-toolchain.toml in the crate pins the version + rustfmt/clippy components;
+      # rustup auto-installs it on first invocation.
+      - name: Install pinned Rust toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          workspaces: ${{ inputs.working-directory }}
+
+      - uses: taiki-e/install-action@15449e3094499af05d8d964a1c884208e4b8b595 # v2.81.11
+        with:
+          tool: cargo-llvm-cov,cargo-deny,cargo-audit
+
+      - name: Format check
+        run: cargo fmt --all --check
+
+      - name: Lint (clippy)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Dependency advisories, bans & licenses (cargo-deny)
+        run: cargo deny check
+
+      - name: Vulnerability audit (cargo-audit)
+        # Accepted/unfixed advisories are listed (with justifications) in
+        # apps/website/api/.cargo/audit.toml, which cargo-audit reads automatically.
+        run: cargo audit
+
+      - name: Tests with coverage
+        # TODO(dev-team): enable a threshold once real tests land, e.g. add
+        # `--fail-under-lines 80` to make coverage a blocking gate.
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ inputs.package }}-coverage
+          path: ${{ inputs.working-directory }}/lcov.info
+          retention-days: 7
+
+      - name: Build image for scanning
+        run: docker build -t ${{ inputs.package }}:scan .
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ inputs.package }}:scan
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

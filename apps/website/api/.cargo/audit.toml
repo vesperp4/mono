@@ -1,0 +1,16 @@
+# cargo-audit configuration (read automatically by `cargo audit`).
+#
+# Accepted advisories. Only add an entry when an advisory has NO fix available
+# AND is not exercised by our usage — always with a justification. Every other
+# advisory (including any with an available fix) must still fail the gate.
+#
+# Note: cargo-audit has no automatic "ignore unfixed" mode (unlike Trivy), so
+# unfixable advisories are accepted explicitly here.
+
+[advisories]
+ignore = [
+    # rsa "Marvin Attack" timing sidechannel. No fixed upgrade upstream; pulled
+    # only transitively via sqlx's macro support, not exercised by our
+    # Postgres-only usage. Re-evaluate when a patched `rsa` is released.
+    "RUSTSEC-2023-0071",
+]

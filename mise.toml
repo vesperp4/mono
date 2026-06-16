@@ -18,9 +18,65 @@ pipx = "1.12.0"
 # Azure tooling — for IaC deploys (see iac/azure/README.md).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
 
+# Rust toolchain for the API service (apps/website/api also pins via
+# rust-toolchain.toml; rustup honors that when entering the crate).
+rust = "1.93.1"
+
+# CI quality/security tooling — mirrors the GitHub Actions gates so they can be
+# reproduced locally.
+actionlint = "latest"
+shellcheck = "latest"
+trivy = "latest"
+cosign = "latest"
+
+# Rust CI helpers (cargo-installed binaries).
+"cargo:cargo-deny" = "latest"
+"cargo:cargo-audit" = "latest"
+"cargo:cargo-llvm-cov" = "latest"
+"cargo:sqlx-cli" = "latest"
+
 [settings]
 # Required for [hooks] below.
 experimental = true
 
 [hooks]
 enter = "bash ./scripts/setup_project"
+
+# --- Local CI parity -------------------------------------------------------
+# These mirror the GitHub Actions gates so the same checks can run locally.
+
+[tasks.db-up]
+description = "Start a local Postgres for development and integration tests"
+run = "docker run --rm -d --name vesperp4-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=vesperp4 -p 5432:5432 postgres:17"
+
+[tasks.db-down]
+description = "Stop the local Postgres"
+run = "docker rm -f vesperp4-pg"
+
+[tasks.check-api]
+description = "Run the API quality gate (mirrors _rust-service-test.yaml). Requires `mise run db-up`."
+dir = "apps/website/api"
+env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
+run = """
+cargo fmt --all --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo deny check
+cargo audit
+cargo llvm-cov --all-features --workspace
+"""
+
+[tasks.check-web]
+description = "Run the web quality gate (lint, typecheck, test)"
+run = "pnpm turbo lint typecheck test --filter=website"
+
+[tasks.lint-workflows]
+description = "Lint GitHub Actions workflows with actionlint"
+run = "actionlint"
+
+[tasks.lint-scripts]
+description = "Lint shell scripts with shellcheck"
+run = "shellcheck scripts/ci/*.sh scripts/setup scripts/setup_project"
+
+[tasks.check]
+description = "Run all local gates (mirrors CI)"
+depends = ["lint-workflows", "lint-scripts", "check-api", "check-web"]
