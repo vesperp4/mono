@@ -21,6 +21,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: azure-acr # OIDC subject must match the id-github-acr-push federated credential
     outputs:
       image: ${{ steps.meta.outputs.image }}
       tag: ${{ steps.meta.outputs.tag }}
