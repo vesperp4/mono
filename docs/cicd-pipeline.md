@@ -50,7 +50,7 @@ feat/* | fix/* | ci/* | chore/*
 | `_update-infra.yaml` | `workflow_call` | Open/auto-merge a PR in the infra repo pinning the image tag for an environment |
 | `website-api-promote-prod.yaml` | manual dispatch | Approval-gated promotion of the dev tag to prod (via `_update-infra.yaml`) |
 | `release-please.yaml` | push `main` | Conventional-commit versioning, CHANGELOGs, per-component tags |
-| `gitleaks.yaml` | PR, push `main`, weekly | Secret scanning (full history) |
+| `secret-scan.yaml` | PR | Secret scanning (TruffleHog — free for orgs) |
 | `dependency-review.yaml` | PR | Block PRs introducing high-severity dependency CVEs |
 | `scorecard.yml` | weekly, push `main` | OpenSSF Scorecard |
 | `deploy.yml` | push `main` | Deploy web to Azure SWA (production) |
@@ -63,7 +63,7 @@ Reusable workflows are prefixed `_`. Project-specific workflows are named
 
 The `*-required` jobs always report (even when their path filter doesn't match), so they are
 safe to mark **required**: `Website API Test / api-required`, `Website Web Test / web-required`,
-`Dependency Review / review`, `Gitleaks / scan`, plus `CI / Typecheck & Build`.
+`Dependency Review / review`, `Secret Scan / scan`, plus `CI / Typecheck & Build`.
 
 > Branch protection's "require status checks" is currently **disabled** while the pipeline
 > stabilizes. Re-enable it with the checks above once the bootstrap steps are done.
@@ -111,7 +111,9 @@ These are intentionally left for the dev team; the scaffolding is in place but n
    API in `_rust-service-test.yaml`; `thresholds` in `apps/website/web/vitest.config.ts`).
 4. **Infra repo** — create it from [`infra-repo-spec.md`](./infra-repo-spec.md), set up the
    GitHub App + Azure OIDC, and configure the secrets/variables above.
-5. **Re-enable branch protection** with the required checks listed above.
+5. **Enable Dependency Graph** (Settings → Code security and analysis) so
+   `dependency-review.yaml` can run.
+6. **Re-enable branch protection** with the required checks listed above.
 
 ---
 
