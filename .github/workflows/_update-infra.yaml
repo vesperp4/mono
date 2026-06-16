@@ -7,7 +7,7 @@ on:
   workflow_call:
     inputs:
       image:
-        description: Image/app name (matches env/<env>/<image>.bicepparam)
+        description: Image/app name (matches apps/<env>/<image>.bicepparam)
         type: string
         required: true
       tag:
@@ -64,7 +64,7 @@ jobs:
       - name: Pin image tag in bicepparam
         run: |
           bash actions-repo/scripts/ci/patch-bicepparam.sh \
-            "infra/env/${{ inputs.environment }}/${{ inputs.image }}.bicepparam" \
+            "infra/apps/${{ inputs.environment }}/${{ inputs.image }}.bicepparam" \
             "${{ inputs.tag }}"
 
       - name: Create or update PR
