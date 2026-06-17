@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/vesperp4/mono/compare/portal-api-v0.5.0...portal-api-v0.6.0) (2026-06-17)
+
+
+### Features
+
+* **portal-api:** send verification email via Azure Communication Services ([#139](https://github.com/vesperp4/mono/issues/139)) ([d54a1fe](https://github.com/vesperp4/mono/commit/d54a1fe4fcda747f90b0a00591f320661038a29b))
+
 ## [0.5.0](https://github.com/vesperp4/mono/compare/portal-api-v0.4.1...portal-api-v0.5.0) (2026-06-17)
 
 
