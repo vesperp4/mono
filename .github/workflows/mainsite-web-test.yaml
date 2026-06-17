@@ -1,4 +1,4 @@
-name: Website Web Test
+name: Mainsite Web Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: website-web-test-${{ github.ref }}
+  group: mainsite-web-test-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -24,9 +24,9 @@ jobs:
         with:
           filters: |
             web:
-              - 'apps/website/web/**'
+              - 'apps/mainsite/web/**'
               - 'packages/**'
-              - '.github/workflows/website-web-test.yaml'
+              - '.github/workflows/mainsite-web-test.yaml'
               - 'scripts/ci/required-gate.sh'
 
   test:
@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Test
-        run: pnpm turbo test --filter=website
+        run: pnpm turbo test --filter=mainsite-web
         env:
           NEXT_TELEMETRY_DISABLED: 1
 

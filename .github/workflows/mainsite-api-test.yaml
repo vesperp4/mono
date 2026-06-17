@@ -1,4 +1,4 @@
-name: Website API Test
+name: Mainsite API Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: website-api-test-${{ github.ref }}
+  group: mainsite-api-test-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -24,8 +24,8 @@ jobs:
         with:
           filters: |
             api:
-              - 'apps/website/api/**'
-              - '.github/workflows/website-api-test.yaml'
+              - 'apps/mainsite/api/**'
+              - '.github/workflows/mainsite-api-test.yaml'
               - '.github/workflows/_rust-service-test.yaml'
               - 'scripts/ci/required-gate.sh'
 
@@ -34,8 +34,8 @@ jobs:
     if: needs.changes.outputs.api == 'true'
     uses: ./.github/workflows/_rust-service-test.yaml
     with:
-      working-directory: apps/website/api
-      package: vesperp4-api
+      working-directory: apps/mainsite/api
+      package: mainsite-api
 
   # Always-reporting aggregate so this check can be marked "required" in branch
   # protection even when `test` is skipped (no API changes in the PR).

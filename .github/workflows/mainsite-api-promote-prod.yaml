@@ -1,4 +1,4 @@
-name: Website API Promote Prod
+name: Mainsite API Promote Prod
 
 # Manually promotes the currently-deployed dev image tag to prod. The `production`
 # environment gate requires reviewer approval before the tag is resolved.
@@ -40,14 +40,14 @@ jobs:
       - name: Read deployed dev tag
         id: read
         run: |
-          tag="$(bash actions-repo/scripts/ci/read-bicepparam-tag.sh infra/apps/dev/vesperp4-api.bicepparam)"
+          tag="$(bash actions-repo/scripts/ci/read-bicepparam-tag.sh infra/apps/dev/mainsite-api.bicepparam)"
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
   promote:
     needs: resolve
     uses: ./.github/workflows/_update-infra.yaml
     with:
-      image: vesperp4-api
+      image: mainsite-api
       tag: ${{ needs.resolve.outputs.tag }}
       environment: prod
       auto_merge: false
