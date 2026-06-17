@@ -34,3 +34,14 @@ updates:
       cargo:
         patterns:
           - "*"
+    ignore:
+      # These majors carry breaking API changes that need a deliberate code
+      # migration (rand 0.9+ renamed thread_rng()/moved RngCore; sha2 0.11 and
+      # tower-http 0.7 change their APIs). Take them in a focused PR, not an
+      # auto-bump. Minor/patch updates still flow.
+      - dependency-name: "rand"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "sha2"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tower-http"
+        update-types: ["version-update:semver-major"]
