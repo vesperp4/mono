@@ -22,10 +22,10 @@ feat/* | fix/* | ci/* | chore/*
     │
     ├──► mainsite-web-deploy.yaml: web → Azure Static Web Apps (production)
     │
-    └──► release-please PR ──(merge)──► tag mainsite-api-vX.Y.Z
+    └──► release-please PR ──(merge)──► tag portal-api-vX.Y.Z
                                             │
                                             ▼
-                         mainsite-api-build.yaml: build + push (ACR) + cosign sign
+                         portal-api-build.yaml: build + push (ACR) + cosign sign
                                             │
                                             ▼
                          _update-infra.yaml: PR in infra repo bumps dev tag (auto-merge)
@@ -33,7 +33,7 @@ feat/* | fix/* | ci/* | chore/*
                                             ▼
                          infra repo deploy → Azure Container Apps (dev)
                                             │
-                         mainsite-api-promote-prod.yaml (manual, approval-gated)
+                         portal-api-promote-prod.yaml (manual, approval-gated)
                                             ▼
                          infra repo PR bumps prod tag (manual merge) → Container Apps (prod)
 ```
@@ -46,11 +46,11 @@ feat/* | fix/* | ci/* | chore/*
 |------|---------|---------|
 | `ci.yml` | PR, push `main` | Repo-wide: commit-msg, `pnpm audit`, format-check, lint/typecheck/build |
 | `mainsite-web-test.yaml` | PR, push `main` | Path-filtered web tests (Vitest) + `web-required` gate |
-| `mainsite-api-test.yaml` | PR, push `main` | Path-filtered API gate → calls `_rust-service-test.yaml`; `api-required` gate |
+| `portal-api-test.yaml` | PR, push `main` | Path-filtered API gate → calls `_rust-service-test.yaml`; `api-required` gate |
 | `_rust-service-test.yaml` | `workflow_call` | fmt, clippy, cargo-deny, cargo-audit, tests + coverage against Postgres, Trivy image scan |
-| `mainsite-api-build.yaml` | tag `mainsite-api-v*` | Build + push image to ACR (provenance + SBOM), cosign sign, trigger infra dev bump |
+| `portal-api-build.yaml` | tag `portal-api-v*` | Build + push image to ACR (provenance + SBOM), cosign sign, trigger infra dev bump |
 | `_update-infra.yaml` | `workflow_call` | Open/auto-merge a PR in the infra repo pinning the image tag for an environment |
-| `mainsite-api-promote-prod.yaml` | manual dispatch | Approval-gated promotion of the dev tag to prod (via `_update-infra.yaml`) |
+| `portal-api-promote-prod.yaml` | manual dispatch | Approval-gated promotion of the dev tag to prod (via `_update-infra.yaml`) |
 | `release-please.yaml` | push `main` | Conventional-commit versioning, CHANGELOGs, per-component tags |
 | `secret-scan.yaml` | PR | Secret scanning (TruffleHog — free for orgs) |
 | `dependency-review.yaml` | PR | Block PRs introducing high-severity dependency CVEs |
@@ -77,8 +77,8 @@ safe to mark **required**: `Mainsite API Test / api-required`, `Mainsite Web Tes
 | Name | Type | Used by | Purpose |
 |------|------|---------|---------|
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | `mainsite-web-deploy.yaml` | Web content upload to Azure SWA (token from the infra-provisioned SWA) |
-| `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` | secret | `mainsite-api-build.yaml` | Azure OIDC login to push to ACR |
-| `ACR_NAME` / `ACR_LOGIN_SERVER` | variable | `mainsite-api-build.yaml` | Target registry (e.g. `vesperp4acr` / `vesperp4acr.azurecr.io`) |
+| `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` | secret | `portal-api-build.yaml` | Azure OIDC login to push to ACR |
+| `ACR_NAME` / `ACR_LOGIN_SERVER` | variable | `portal-api-build.yaml` | Target registry (e.g. `vesperp4acr` / `vesperp4acr.azurecr.io`) |
 | `INFRA_APP_ID` / `INFRA_APP_KEY` | secret | `_update-infra.yaml`, promote | GitHub App that can open PRs in the infra repo |
 | `INFRA_REPO_NAME` | variable | `_update-infra.yaml`, promote | Infra repo name (e.g. `infra`) |
 | `RELEASE_PLEASE_TOKEN` | secret | `release-please.yaml` | PAT/App token so release tags trigger the build workflow (GITHUB_TOKEN would not) |
@@ -102,8 +102,9 @@ mise run format        # auto-format (Prettier)
 # quality gates (each mirrors a GitHub Actions check)
 mise run format-check  # pnpm turbo format-check
 mise run audit         # pnpm audit --prod
-mise run check-web     # lint, typecheck, test, build
-mise run check-api     # fmt, clippy, cargo-deny, cargo-audit, coverage (needs db-up)
+mise run check-mainsite-web # lint, typecheck, test, build (mainsite-web)
+mise run check-portal-web   # lint, typecheck, test, build (portal-web)
+mise run check-portal-api   # fmt, clippy, cargo-deny, cargo-audit, coverage (needs db-up)
 mise run lint-workflows # actionlint
 mise run lint-scripts   # shellcheck
 mise run check         # ALL of the above — run before pushing
@@ -118,7 +119,7 @@ mise run db-up / db-down
 
 These are intentionally left for the dev team; the scaffolding is in place but not built:
 
-1. **API lockfile** — `cd apps/mainsite/api && cargo build` to generate and commit `Cargo.lock`
+1. **API lockfile** — `cd apps/portal/api && cargo build` to generate and commit `Cargo.lock`
    (the Dockerfile and CI use `--locked`).
 2. **Web test deps** — add `vitest` and `@vitest/coverage-v8` as devDependencies in
    `apps/mainsite/web`, then run `pnpm install` to update `pnpm-lock.yaml`.

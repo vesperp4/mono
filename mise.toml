@@ -19,7 +19,7 @@ pipx = "1.12.0"
 # deploys live in the separate infra repo; see docs/entra-identity.md for Entra).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
 
-# Rust toolchain for the API service (apps/mainsite/api also pins via
+# Rust toolchain for the API service (apps/portal/api also pins via
 # rust-toolchain.toml; rustup honors that when entering the crate).
 rust = "1.93.1"
 
@@ -95,13 +95,17 @@ run = "pnpm turbo format-check"
 description = "Audit production dependencies for CVEs (mirrors ci.yml)"
 run = "pnpm audit --prod"
 
-[tasks.check-web]
-description = "Web/TS gate: lint, typecheck, test, build (mirrors ci.yml + mainsite-web-test.yaml)"
-run = "pnpm turbo lint typecheck test build"
+[tasks.check-mainsite-web]
+description = "mainsite-web gate: lint, typecheck, test, build (mirrors mainsite-web-test.yaml)"
+run = "pnpm turbo lint typecheck test build --filter=mainsite-web"
 
-[tasks.check-api]
+[tasks.check-portal-web]
+description = "portal-web gate: lint, typecheck, test, build (mirrors portal-web-test.yaml)"
+run = "pnpm turbo lint typecheck test build --filter=portal-web"
+
+[tasks.check-portal-api]
 description = "API gate: fmt, clippy, deny, audit, coverage (mirrors _rust-service-test.yaml). Needs `mise run db-up`."
-dir = "apps/mainsite/api"
+dir = "apps/portal/api"
 shell = "bash -c"
 env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
 run = """
@@ -125,4 +129,4 @@ run = "shellcheck scripts/ci/*.sh scripts/setup scripts/setup_project"
 
 [tasks.check]
 description = "Run every local gate (mirrors CI). Run before pushing."
-depends = ["lint-workflows", "lint-scripts", "audit", "format-check", "check-web", "check-api"]
+depends = ["lint-workflows", "lint-scripts", "audit", "format-check", "check-mainsite-web", "check-portal-web", "check-portal-api"]

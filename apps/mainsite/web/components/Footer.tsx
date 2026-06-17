@@ -18,12 +18,15 @@ function distanceToStretch(distance: number): number {
   return Math.round(150 - (75 * distance) / FALLOFF_RADIUS);
 }
 
-const NAV_LINKS = [
+// Signup lives on the portal app (portal.vesperp4.com), not the mainsite.
+const PORTAL_SIGNUP_URL = "https://portal.vesperp4.com/signup";
+
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "About", href: "#about" },
   { label: "Pillars", href: "#pillars" },
   { label: "Founders", href: "#stars" },
   { label: "Mission", href: "#mission" },
-  { label: "Join", href: "#join" },
+  { label: "Join", href: PORTAL_SIGNUP_URL, external: true },
 ];
 
 const PILLAR_COLORS = ["#dc2626", "#2563eb", "#16a34a", "#7c3aed"];
@@ -117,15 +120,25 @@ export default function Footer() {
                 Navigation
               </span>
               <nav className="flex flex-col gap-3">
-                {NAV_LINKS.map((link) => (
-                  <button
-                    key={link.href}
-                    onClick={() => scrollTo(link.href)}
-                    className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 text-left w-fit"
-                  >
-                    {link.label}
-                  </button>
-                ))}
+                {NAV_LINKS.map((link) =>
+                  link.external ? (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 text-left w-fit"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <button
+                      key={link.href}
+                      onClick={() => scrollTo(link.href)}
+                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 text-left w-fit"
+                    >
+                      {link.label}
+                    </button>
+                  )
+                )}
               </nav>
             </div>
 
