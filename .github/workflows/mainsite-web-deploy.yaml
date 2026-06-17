@@ -1,11 +1,18 @@
-name: Deploy
+name: mainsite-web Deploy
 
+# Builds the Next.js frontend and uploads it to the infra-managed Azure Static
+# Web App (mainsite-web-prod) using its deployment token. The SWA resource
+# itself is provisioned in the infra repo (bicep/web.bicep), not here.
 on:
   push:
     branches: [main]
+    paths:
+      - 'apps/mainsite/web/**'
+      - '.github/workflows/mainsite-web-deploy.yaml'
+  workflow_dispatch:
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: mainsite-web-deploy-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
