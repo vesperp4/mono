@@ -1,5 +1,5 @@
 {
-  "apps/portal/api": "0.3.0",
+  "apps/portal/api": "0.4.0",
   "apps/mainsite/web": "0.2.0",
   "apps/portal/web": "0.2.0"
 }

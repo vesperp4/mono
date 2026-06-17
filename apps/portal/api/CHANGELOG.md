@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/vesperp4/mono/compare/portal-api-v0.3.0...portal-api-v0.4.0) (2026-06-17)
+
+
+### Features
+
+* **portal-api:** passwordless Entra Postgres auth ([#132](https://github.com/vesperp4/mono/issues/132)) ([84b631e](https://github.com/vesperp4/mono/commit/84b631efb90f41ebbc6a5e1dbc26acb833d7b37b))
+
 ## [0.3.0](https://github.com/vesperp4/mono/compare/portal-api-v0.2.2...portal-api-v0.3.0) (2026-06-17)
 
 
