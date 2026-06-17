@@ -183,28 +183,26 @@ mise install
 ## Branch Workflow
 
 ```
-feat/* or fix/*  →  PR to dev  →  staging  →  PR to main  →  production
+feat/* or fix/*  →  PR to main  →  production
 ```
 
-- Always branch off `dev`, never `main`
+- Trunk-based: branch off `main`, open a PR back to `main`
 - Use conventional commit prefixes for branch names: `feat/`, `fix/`, `chore/`, `docs/`
-- PRs to `main` must come from `dev` only — CI will reject anything else
 - 1 approval required before merging any PR
 
 ### Creating a branch
 
 ```bash
-git checkout dev
-git pull origin dev
+git checkout main
+git pull origin main
 git checkout -b feat/your-feature-name
 ```
 
 ### Merge strategy
 
-| Target branch | Merge method         | Why                                              |
-| ------------- | -------------------- | ------------------------------------------------ |
-| `dev`         | Squash and merge     | Keeps history clean — one commit per feature/fix |
-| `main`        | Create a merge commit| Clear record of when dev was promoted to production |
+| Target branch | Merge method     | Why                                              |
+| ------------- | ---------------- | ------------------------------------------------ |
+| `main`        | Squash and merge | Keeps history clean — one commit per feature/fix |
 
 ---
 

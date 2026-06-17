@@ -2,8 +2,10 @@
 
 Reference for the Vesper P4 CI/CD pipeline. **Trunk-based on `main`.** The Next.js
 **web** app deploys to Azure Static Web Apps; the Rust **api** is containerized, pushed to
-Azure Container Registry (ACR), and deployed to **Azure Container Apps** via a separate
-**infra repo** (see [`infra-repo-spec.md`](./infra-repo-spec.md)).
+Azure Container Registry (ACR), and deployed to **Azure Container Apps**. Both the Static
+Web App and the Container App are provisioned in a separate **infra repo** (see
+[`infra-repo-spec.md`](./infra-repo-spec.md)); the monorepo builds artifacts and ships them
+(web content via the SWA deploy token, the api image via ACR).
 
 > Status: the pipeline is scaffolded and ready. A few one-time **bootstrap steps** (below)
 > must be done by the dev team before all checks go green.
@@ -18,7 +20,7 @@ feat/* | fix/* | ci/* | chore/*
     ▼  PR
   main ──► CI gates (web test, api test, security, dependency review)
     │
-    ├──► deploy.yml: web → Azure Static Web Apps (production)
+    ├──► mainsite-web-deploy.yaml: web → Azure Static Web Apps (production)
     │
     └──► release-please PR ──(merge)──► tag mainsite-api-vX.Y.Z
                                             │
@@ -53,7 +55,7 @@ feat/* | fix/* | ci/* | chore/*
 | `secret-scan.yaml` | PR | Secret scanning (TruffleHog — free for orgs) |
 | `dependency-review.yaml` | PR | Block PRs introducing high-severity dependency CVEs |
 | `scorecard.yml` | weekly, push `main` | OpenSSF Scorecard |
-| `deploy.yml` | push `main` | Deploy web to Azure SWA (production) |
+| `mainsite-web-deploy.yaml` | push `main` (web paths), dispatch | Build + upload web content to Azure SWA (production) |
 | `pr-title.yml` | PR | Semantic PR title check |
 
 Reusable workflows are prefixed `_`. Project-specific workflows are named
@@ -74,7 +76,7 @@ safe to mark **required**: `Mainsite API Test / api-required`, `Mainsite Web Tes
 
 | Name | Type | Used by | Purpose |
 |------|------|---------|---------|
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | `deploy.yml` | Web deploy to Azure SWA |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | `mainsite-web-deploy.yaml` | Web content upload to Azure SWA (token from the infra-provisioned SWA) |
 | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` | secret | `mainsite-api-build.yaml` | Azure OIDC login to push to ACR |
 | `ACR_NAME` / `ACR_LOGIN_SERVER` | variable | `mainsite-api-build.yaml` | Target registry (e.g. `vesperp4acr` / `vesperp4acr.azurecr.io`) |
 | `INFRA_APP_ID` / `INFRA_APP_KEY` | secret | `_update-infra.yaml`, promote | GitHub App that can open PRs in the infra repo |

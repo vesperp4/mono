@@ -1,13 +1,16 @@
 # Infra Repo Spec
 
+> **Historical scaffold spec — the infra repo now exists.** This was the original design
+> brief; the live repo is the source of truth. Some details here are out of date (e.g. the
+> param layout is now `apps/<env>/<app-group>/<component>.bicepparam`, and the web app's
+> Static Web App is provisioned in the infra repo via `web.bicep`, not just deployed from the
+> monorepo). See the infra repo's own `README.md` for current structure and conventions.
+
 Scaffold spec for the **separate infrastructure repo** that deploys the Vesper P4 backend to
 **Azure Container Apps**. It is the source of truth for *which image tag runs in each
 environment* (dev/prod). It plays the role of the reference project's GitOps repo
 (`RamonCollazo/cicd-workflow-gitops`) but uses **Bicep + `az deployment`** instead of
 Kubernetes/Flux/kustomize.
-
-> This repo does not exist yet. The monorepo already references it via the `INFRA_REPO_NAME`
-> variable and pushes image-tag bumps into it (`_update-infra.yaml`).
 
 ---
 
