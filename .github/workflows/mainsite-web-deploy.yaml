@@ -23,10 +23,9 @@ jobs:
     name: Deploy to Azure Static Web Apps
     runs-on: ubuntu-latest
 
-    # Trunk-based: main deploys to production. Staging/preview environments for
-    # the web app can be reintroduced via Azure SWA per-PR preview environments.
-    environment:
-      name: production
+    # Scoped to the azure-swa environment, which holds AZURE_STATIC_WEB_APPS_API_TOKEN
+    # (mirrors azure-acr for the api build). No reviewer gate — trunk-based auto-deploy.
+    environment: azure-swa
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
