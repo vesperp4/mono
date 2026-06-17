@@ -11,10 +11,10 @@ COPY migrations ./migrations
 # so it survives into the final stage.
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/app/target \
-    cargo build --release --locked --bin vesperp4-api \
-    && cp /app/target/release/vesperp4-api /usr/local/bin/vesperp4-api
+    cargo build --release --locked --bin mainsite-api \
+    && cp /app/target/release/mainsite-api /usr/local/bin/mainsite-api
 
 FROM gcr.io/distroless/cc-debian12:nonroot AS runtime
-COPY --from=builder /usr/local/bin/vesperp4-api /usr/local/bin/vesperp4-api
+COPY --from=builder /usr/local/bin/mainsite-api /usr/local/bin/mainsite-api
 EXPOSE 3001
-ENTRYPOINT ["/usr/local/bin/vesperp4-api"]
+ENTRYPOINT ["/usr/local/bin/mainsite-api"]

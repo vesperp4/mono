@@ -11,7 +11,7 @@
 /infra/ @vesperp4/tech-lead
 
 # Website app
-/apps/website/ @vesperp4/tech-lead
+/apps/mainsite/ @vesperp4/tech-lead
 
 # Shared packages
 /packages/eslint-config/ @vesperp4/tech-lead

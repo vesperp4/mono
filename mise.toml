@@ -18,7 +18,7 @@ pipx = "1.12.0"
 # Azure tooling — for IaC deploys (see iac/azure/README.md).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
 
-# Rust toolchain for the API service (apps/website/api also pins via
+# Rust toolchain for the API service (apps/mainsite/api also pins via
 # rust-toolchain.toml; rustup honors that when entering the crate).
 rust = "1.93.1"
 
@@ -55,7 +55,7 @@ run = "docker rm -f vesperp4-pg"
 
 [tasks.check-api]
 description = "Run the API quality gate (mirrors _rust-service-test.yaml). Requires `mise run db-up`."
-dir = "apps/website/api"
+dir = "apps/mainsite/api"
 env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
 run = """
 cargo fmt --all --check
@@ -67,7 +67,7 @@ cargo llvm-cov --all-features --workspace
 
 [tasks.check-web]
 description = "Run the web quality gate (lint, typecheck, test)"
-run = "pnpm turbo lint typecheck test --filter=website"
+run = "pnpm turbo lint typecheck test --filter=mainsite-web"
 
 [tasks.lint-workflows]
 description = "Lint GitHub Actions workflows with actionlint"

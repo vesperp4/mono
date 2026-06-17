@@ -46,8 +46,8 @@ pnpm dev
 
 ```
 apps/
-  website/          Website project
-    web/            Main website (Next.js)
+  mainsite/         Main site (web frontend + api)
+    web/            Web frontend (Next.js)
       src/
         app/        App Router pages and layouts
         components/ UI components (ui/, layout/, sections/, common/)

@@ -67,7 +67,7 @@ jobs:
 
       - name: Vulnerability audit (cargo-audit)
         # Accepted/unfixed advisories are listed (with justifications) in
-        # apps/website/api/.cargo/audit.toml, which cargo-audit reads automatically.
+        # apps/mainsite/api/.cargo/audit.toml, which cargo-audit reads automatically.
         run: cargo audit
 
       - name: Tests with coverage

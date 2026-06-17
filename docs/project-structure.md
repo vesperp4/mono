@@ -22,12 +22,12 @@ mono/
 
 ---
 
-## apps/website/web
+## apps/mainsite/web
 
 The main Next.js website.
 
 ```
-apps/website/web/
+apps/mainsite/web/
 ├── src/
 │   ├── app/                Next.js App Router
 │   │   ├── layout.tsx      Root layout (html, body, global styles)

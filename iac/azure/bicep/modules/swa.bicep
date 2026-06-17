@@ -21,7 +21,7 @@ resource swa 'Microsoft.Web/staticSites@2023-12-01' = {
     repositoryUrl: repositoryUrl
     branch: branch
     buildProperties: {
-      appLocation: 'apps/website/web'
+      appLocation: 'apps/mainsite/web'
       outputLocation: '.next'
       skipGithubActionWorkflowGeneration: true
     }

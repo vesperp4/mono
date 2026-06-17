@@ -2,15 +2,15 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "separate-pull-requests": true,
   "packages": {
-    "apps/website/api": {
+    "apps/mainsite/api": {
       "release-type": "rust",
-      "component": "vesperp4-api",
+      "component": "mainsite-api",
       "include-component-in-tag": true,
       "changelog-path": "CHANGELOG.md"
     },
-    "apps/website/web": {
+    "apps/mainsite/web": {
       "release-type": "node",
-      "component": "website",
+      "component": "mainsite-web",
       "include-component-in-tag": true,
       "changelog-path": "CHANGELOG.md"
     }

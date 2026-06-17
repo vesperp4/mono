@@ -28,7 +28,7 @@ infra/
     modules/
       acr.bicep                   # Azure Container Registry (shared bootstrap)
       containerapps-env.bicep     # Container Apps managed environment (per env)
-      containerapp-api.bicep      # the vesperp4-api Container App
+      containerapp-api.bicep      # the mainsite-api Container App
       postgres.bicep              # Azure Database for PostgreSQL Flexible Server
   env/
     dev/
@@ -80,10 +80,10 @@ steps:
 
 ## Promotion flow
 
-1. `website-api-build.yaml` (monorepo) pushes `vesperp4-api:X.Y.Z` to ACR and calls
+1. `mainsite-api-build.yaml` (monorepo) pushes `mainsite-api:X.Y.Z` to ACR and calls
    `_update-infra.yaml` → opens an **auto-merged** PR bumping `env/dev/api.bicepparam`.
 2. Infra `deploy.yaml` reconciles **dev** on merge.
-3. `website-api-promote-prod.yaml` (monorepo, manual, approval-gated) reads the deployed dev
+3. `mainsite-api-promote-prod.yaml` (monorepo, manual, approval-gated) reads the deployed dev
    tag and opens a **non-auto-merged** PR bumping `env/prod/api.bicepparam`.
 4. A human merges it; infra `deploy.yaml` reconciles **prod**.
 
@@ -92,7 +92,7 @@ steps:
 ## Auth chain (set up once)
 
 - **CI → ACR push:** Azure OIDC federated credential for the monorepo's
-  `website-api-build.yaml` (`AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID`), with `AcrPush` on the
+  `mainsite-api-build.yaml` (`AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID`), with `AcrPush` on the
   registry.
 - **CI → infra repo:** a **GitHub App** installed on the infra repo (Contents + Pull requests
   read/write); its `INFRA_APP_ID` / `INFRA_APP_KEY` live in the monorepo.
@@ -109,7 +109,7 @@ steps:
 |----------|-------|
 | Azure Container Registry | Shared; `AcrPush` for CI, `AcrPull` for the app identity |
 | Container Apps environment | One per env (dev/prod); scale-to-zero keeps cost low |
-| Container App `vesperp4-api` | Image `…azurecr.io/vesperp4-api:<imageTag>`, port 3001, `DATABASE_URL` from secret |
+| Container App `mainsite-api` | Image `…azurecr.io/mainsite-api:<imageTag>`, port 3001, `DATABASE_URL` from secret |
 | Azure DB for PostgreSQL Flexible Server | Managed Postgres; dev may use Burstable B1ms |
 
 ---
@@ -120,4 +120,4 @@ steps:
   envs pull from the same registry, only the tag differs.
 - The web app stays on Azure Static Web Apps (deployed from the monorepo). If it is later
   containerized, add a `containerapp-web.bicep` + `env/<env>/web.bicepparam` and a matching
-  `website-web-build.yaml` in the monorepo.
+  `mainsite-web-build.yaml` in the monorepo.
