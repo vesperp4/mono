@@ -1,13 +1,14 @@
 use std::sync::Arc;
 
-use sqlx::PgPool;
-
+use crate::db::SharedPool;
 use crate::email::EmailSender;
 
 /// Shared application state, cloned into every request handler.
 #[derive(Clone)]
 pub struct AppState {
-    pub db: PgPool,
+    /// The Postgres pool. In Azure it is rebuilt on Entra-token refresh, so
+    /// always `db.load()` it per use rather than caching the inner pool.
+    pub db: SharedPool,
     /// Transactional email provider (a stub until a real one is wired).
     pub email: Arc<dyn EmailSender>,
     /// Public origin used to build verification links, e.g. `https://portal.vesperp4.com`.

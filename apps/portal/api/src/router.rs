@@ -71,7 +71,7 @@ pub fn build_router(state: AppState) -> Router {
 }
 
 async fn health(State(state): State<AppState>) -> impl IntoResponse {
-    match probe_db(&state.db).await {
+    match probe_db(&state.db.load()).await {
         Ok(_) => (
             StatusCode::OK,
             Json(json!({"status": "ok", "database": "up"})),

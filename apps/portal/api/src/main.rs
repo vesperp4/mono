@@ -38,10 +38,10 @@ async fn main() -> anyhow::Result<()> {
         .unwrap_or_else(|| vec![public_base_url.clone()]);
 
     // Connects via DATABASE_URL locally, or passwordless (Entra token via the
-    // managed identity) in Azure. See `db::build_pool`.
-    let db = db::build_pool().await?;
+    // managed identity) in Azure, with background token refresh. See `db::init`.
+    let db = db::init().await?;
 
-    sqlx::migrate!().run(&db).await?;
+    sqlx::migrate!().run(&**db.load()).await?;
 
     let state = AppState {
         db,
