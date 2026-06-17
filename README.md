@@ -61,7 +61,6 @@ apps/
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
   eslint-config/    Shared ESLint config
-infra/              Docker, scripts, and IaC (future)
 .github/
   workflows/        CI/CD — lint, typecheck, build, deploy
 ```

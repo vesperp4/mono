@@ -35,7 +35,7 @@ The same `python` is reused by `pre-commit` (Python zipapp) and `commitizen` (pi
 Two reasons:
 
 1. **Quarterly Tech Lead handoff.** A new contributor opens the devcontainer and gets the same toolchain the previous Tech Lead had. If `latest` pulls a breaking release the day they onboard, the first hour is debugging tools instead of learning.
-2. **Reproducible runbooks.** When [`iac/azure/README.md`](../iac/azure/README.md) says "run `az ...`," the exact CLI behavior should match what's documented.
+2. **Reproducible runbooks.** When a runbook (e.g. [`docs/entra-identity.md`](../docs/entra-identity.md), or the deploy steps in the separate infra repo) says "run `az ...`," the exact CLI behavior should match what's documented.
 
 Three outliers use `latest`:
 

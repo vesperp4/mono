@@ -1,8 +1,8 @@
-# `iac/azure/entra/` — Identity & access for the vesperp4 Entra tenant
+# Entra Identity & Access — vesperp4 tenant
 
 Companion teaching doc for how identity and access is structured in the chapter's Entra tenant — who has what role, why each choice was made, and which Microsoft Learn page backs each decision.
 
-Unlike `iac/azure/bicep/`, there is no Bicep here. Entra resources (security groups, role assignments, directory roles, tenant policies) live in Microsoft Graph rather than Azure Resource Manager. The `Microsoft.Graph` Bicep extension is still preview and shape-changes frequently, so for now this layer is documented prose + the `az` commands you ran to create the state. When the Graph extension stabilizes we'll port this to Bicep.
+Unlike the Azure resource provisioning (which lives as Bicep in the separate **infra repo**), there is no Bicep here. Entra resources (security groups, role assignments, directory roles, tenant policies) live in Microsoft Graph rather than Azure Resource Manager. The `Microsoft.Graph` Bicep extension is still preview and shape-changes frequently, so for now this layer is documented prose + the `az` commands you ran to create the state. When the Graph extension stabilizes we'll port this to Bicep.
 
 ---
 
