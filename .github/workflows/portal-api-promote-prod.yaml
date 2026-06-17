@@ -11,7 +11,7 @@ permissions:
 jobs:
   resolve:
     runs-on: ubuntu-latest
-    environment: production # required-reviewer approval gate
+    environment: prod # required-reviewer approval gate (matches infra's prod env naming)
     outputs:
       tag: ${{ steps.read.outputs.tag }}
     steps:
