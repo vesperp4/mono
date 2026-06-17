@@ -26,9 +26,14 @@ Official website for the Vesper P4 graduate CS/engineering chapter at Polytechni
 
 ## Getting Started
 
+**New to this kind of project (or to coding)?** Start with the
+[**Onboarding guide**](./docs/onboarding.md) — it explains everything from scratch and walks
+you through your first contribution. Unfamiliar terms are defined in the
+[Glossary](./docs/glossary.md).
+
 Full setup instructions are in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Quick version:
+Quick version (if you've done this before):
 
 ```bash
 git clone https://github.com/vesperp4/mono.git

@@ -98,5 +98,8 @@ Placeholder for future infrastructure work — Dockerfiles, deployment scripts, 
 
 | File | Contents |
 |------|----------|
+| `onboarding.md` | Beginner-first "start here" walkthrough — setup through first PR |
+| `glossary.md` | Plain-English definitions of every term and tool |
 | `project-structure.md` | This file |
 | `cicd-pipeline.md` | CI/CD pipeline reference |
+| `infra-repo-spec.md` | Historical scaffold spec for the infra repo |
