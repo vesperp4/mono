@@ -1,10 +1,10 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use portal_api::db;
 use portal_api::email::LogEmailSender;
 use portal_api::router;
 use portal_api::state::AppState;
-use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -13,9 +13,6 @@ async fn main() -> anyhow::Result<()> {
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .init();
-
-    let database_url =
-        std::env::var("DATABASE_URL").map_err(|_| anyhow::anyhow!("DATABASE_URL must be set"))?;
 
     // Origin the verification link points at (the portal web app, which hosts
     // the /confirm page). Defaults to prod.
@@ -40,10 +37,9 @@ async fn main() -> anyhow::Result<()> {
         })
         .unwrap_or_else(|| vec![public_base_url.clone()]);
 
-    let db = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await?;
+    // Connects via DATABASE_URL locally, or passwordless (Entra token via the
+    // managed identity) in Azure. See `db::build_pool`.
+    let db = db::build_pool().await?;
 
     sqlx::migrate!().run(&db).await?;
 
