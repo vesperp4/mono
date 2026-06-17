@@ -10,7 +10,6 @@ Full reference for the Vesper P4 monorepo layout.
 mono/
 ├── apps/                   Project-grouped deployable applications
 ├── packages/               Shared internal packages
-├── infra/                  Infrastructure, scripts, IaC (future)
 ├── docs/                   Architecture and reference docs
 ├── .github/workflows/       GitHub Actions CI/CD
 ├── .pre-commit-config.yaml  Pre-commit hooks (lint, conventional commits)
@@ -88,9 +87,12 @@ export default config;
 
 ---
 
-## infra/
+## Infrastructure
 
-Placeholder for future infrastructure work — Dockerfiles, deployment scripts, Terraform/Pulumi.
+Cloud infrastructure (Azure Container Apps, Static Web Apps, PostgreSQL, etc.) is
+Infrastructure-as-Code in a **separate infra repo** — not in this monorepo. Entra tenant
+identity & access is documented here in [`docs/entra-identity.md`](./entra-identity.md)
+(it lives in Microsoft Graph, not ARM/Bicep).
 
 ---
 
@@ -100,6 +102,7 @@ Placeholder for future infrastructure work — Dockerfiles, deployment scripts, 
 |------|----------|
 | `onboarding.md` | Beginner-first "start here" walkthrough — setup through first PR |
 | `glossary.md` | Plain-English definitions of every term and tool |
+| `entra-identity.md` | Entra tenant identity & access runbook (groups, break-glass, security defaults) |
 | `project-structure.md` | This file |
 | `cicd-pipeline.md` | CI/CD pipeline reference |
 | `infra-repo-spec.md` | Historical scaffold spec for the infra repo |
