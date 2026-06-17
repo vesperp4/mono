@@ -26,8 +26,8 @@ repos:
 
       - id: cargo-fmt
         name: cargo fmt
-        entry: bash -c 'cd apps/mainsite/api && cargo fmt --all -- --check'
+        entry: bash -c 'cd apps/portal/api && cargo fmt --all -- --check'
         language: system
-        files: ^apps/mainsite/api/.*\.rs$
+        files: ^apps/portal/api/.*\.rs$
         pass_filenames: false
         stages: [pre-commit]

@@ -26,7 +26,7 @@ updates:
           - "*"
 
   - package-ecosystem: "cargo"
-    directory: "/apps/mainsite/api"
+    directory: "/apps/portal/api"
     target-branch: "main"
     schedule:
       interval: "weekly"

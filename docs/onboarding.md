@@ -237,7 +237,7 @@ Rules of thumb:
   name becomes the URL.
 - **Reusing a piece (a button, a card) in many places?** Put it in `components/`.
 
-The backend lives in `apps/mainsite/api/` (Rust). Most newcomers won't touch it for a while —
+The backend lives in `apps/portal/api/` (Rust). Most newcomers won't touch it for a while —
 that's fine.
 
 ---

@@ -1,4 +1,4 @@
-name: Mainsite API Test
+name: Portal API Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: mainsite-api-test-${{ github.ref }}
+  group: portal-api-test-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -24,8 +24,8 @@ jobs:
         with:
           filters: |
             api:
-              - 'apps/mainsite/api/**'
-              - '.github/workflows/mainsite-api-test.yaml'
+              - 'apps/portal/api/**'
+              - '.github/workflows/portal-api-test.yaml'
               - '.github/workflows/_rust-service-test.yaml'
               - 'scripts/ci/required-gate.sh'
 
@@ -34,8 +34,8 @@ jobs:
     if: needs.changes.outputs.api == 'true'
     uses: ./.github/workflows/_rust-service-test.yaml
     with:
-      working-directory: apps/mainsite/api
-      package: mainsite-api
+      working-directory: apps/portal/api
+      package: portal-api
 
   # Always-reporting aggregate so this check can be marked "required" in branch
   # protection even when `test` is skipped (no API changes in the PR).

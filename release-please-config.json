@@ -2,15 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "separate-pull-requests": true,
   "packages": {
-    "apps/mainsite/api": {
+    "apps/portal/api": {
       "release-type": "rust",
-      "component": "mainsite-api",
+      "component": "portal-api",
       "include-component-in-tag": true,
       "changelog-path": "CHANGELOG.md"
     },
     "apps/mainsite/web": {
       "release-type": "node",
       "component": "mainsite-web",
+      "include-component-in-tag": true,
+      "changelog-path": "CHANGELOG.md"
+    },
+    "apps/portal/web": {
+      "release-type": "node",
+      "component": "portal-web",
       "include-component-in-tag": true,
       "changelog-path": "CHANGELOG.md"
     }
