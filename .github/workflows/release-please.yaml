@@ -4,9 +4,10 @@ on:
   push:
     branches: [main]
 
+# Read-only by default; the write scopes the release job needs are declared on
+# the job itself (keeps the OpenSSF Scorecard Token-Permissions check green).
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: release-please-${{ github.ref }}
@@ -15,6 +16,9 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       # Mint a GitHub App token (shared vesperp4-ci-bot app). Using an App token
       # rather than GITHUB_TOKEN lets the release tag push trigger the Website
