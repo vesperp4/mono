@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 
 use portal_api::db;
-use portal_api::email::LogEmailSender;
+use portal_api::email::{AcsEmailSender, EmailSender, LogEmailSender};
 use portal_api::router;
 use portal_api::state::AppState;
 
@@ -43,9 +43,33 @@ async fn main() -> anyhow::Result<()> {
 
     sqlx::migrate!().run(&**db.load()).await?;
 
+    // Use Azure Communication Services when the infra has wired its endpoint +
+    // sender; otherwise fall back to the log-only stub (local/CI, or before the
+    // managed identity is granted send access). Selecting on env keeps handlers
+    // and tests provider-agnostic.
+    let email: Arc<dyn EmailSender> = match (
+        std::env::var("ACS_ENDPOINT"),
+        std::env::var("ACS_SENDER_ADDRESS"),
+    ) {
+        (Ok(endpoint), Ok(sender)) if !endpoint.is_empty() && !sender.is_empty() => {
+            tracing::info!(
+                endpoint,
+                sender,
+                "sending verification mail via Azure Communication Services"
+            );
+            Arc::new(AcsEmailSender::new(endpoint, sender)?)
+        }
+        _ => {
+            tracing::info!(
+                "ACS not configured — using LogEmailSender (links are logged, not emailed)"
+            );
+            Arc::new(LogEmailSender)
+        }
+    };
+
     let state = AppState {
         db,
-        email: Arc::new(LogEmailSender),
+        email,
         public_base_url,
         verification_ttl_hours,
         cors_allowed_origins,
