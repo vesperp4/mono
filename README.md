@@ -33,16 +33,20 @@ you through your first contribution. Unfamiliar terms are defined in the
 
 Full setup instructions are in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Quick version (if you've done this before):
+Quick version (if you've done this before) — [mise](https://mise.jdx.dev) installs the
+toolchain and is the front door for every task:
 
 ```bash
 git clone https://github.com/vesperp4/mono.git
 cd mono
-pnpm install
-pnpm dev
+mise install        # install the pinned toolchain (node, pnpm, rust, …)
+mise run setup      # install dependencies + git hooks
+mise run dev        # start the dev server
 ```
 
 → App: [http://localhost:3000](http://localhost:3000)
+
+Run `mise tasks` to see everything available; `mise run check` runs all the CI gates locally.
 
 ---
 

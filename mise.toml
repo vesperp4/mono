@@ -40,11 +40,42 @@ cosign = "latest"
 # Required for [hooks] below.
 experimental = true
 
+[env]
+# Applied to every `mise run` task. Keeps Next.js quiet and pins Turbo's cache
+# dir so local runs share the same cache CI uses.
+NEXT_TELEMETRY_DISABLED = "1"
+TURBO_CACHE_DIR = ".turbo"
+
 [hooks]
 enter = "bash ./scripts/setup_project"
 
-# --- Local CI parity -------------------------------------------------------
-# These mirror the GitHub Actions gates so the same checks can run locally.
+# ===========================================================================
+# `mise run` is the front door. New here? Run `mise tasks` to see everything,
+# `mise run setup` once, then `mise run dev`. Before pushing: `mise run check`.
+# ===========================================================================
+
+# --- Everyday workflow -----------------------------------------------------
+
+[tasks.setup]
+description = "First-time setup: install dependencies and wire up git hooks"
+run = """
+pnpm install
+pre-commit install --hook-type pre-commit --hook-type commit-msg
+"""
+
+[tasks.dev]
+description = "Start the dev server(s) with hot reload (web → http://localhost:3000)"
+run = "pnpm turbo dev"
+
+[tasks.build]
+description = "Build everything the way CI does (production build)"
+run = "pnpm turbo build"
+
+[tasks.format]
+description = "Auto-format the codebase (Prettier)"
+run = "pnpm turbo format --continue"
+
+# --- Local database (for the API + integration tests) ----------------------
 
 [tasks.db-up]
 description = "Start a local Postgres for development and integration tests"
@@ -54,21 +85,33 @@ run = "docker run --rm -d --name vesperp4-pg -e POSTGRES_USER=postgres -e POSTGR
 description = "Stop the local Postgres"
 run = "docker rm -f vesperp4-pg"
 
+# --- Quality gates: each mirrors a GitHub Actions check --------------------
+
+[tasks.format-check]
+description = "Check formatting without writing (mirrors ci.yml)"
+run = "pnpm turbo format-check"
+
+[tasks.audit]
+description = "Audit production dependencies for CVEs (mirrors ci.yml)"
+run = "pnpm audit --prod"
+
+[tasks.check-web]
+description = "Web/TS gate: lint, typecheck, test, build (mirrors ci.yml + mainsite-web-test.yaml)"
+run = "pnpm turbo lint typecheck test build"
+
 [tasks.check-api]
-description = "Run the API quality gate (mirrors _rust-service-test.yaml). Requires `mise run db-up`."
+description = "API gate: fmt, clippy, deny, audit, coverage (mirrors _rust-service-test.yaml). Needs `mise run db-up`."
 dir = "apps/mainsite/api"
+shell = "bash -c"
 env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
 run = """
+set -euo pipefail
 cargo fmt --all --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo deny check
 cargo audit
 cargo llvm-cov --all-features --workspace
 """
-
-[tasks.check-web]
-description = "Run the web quality gate (lint, typecheck, test)"
-run = "pnpm turbo lint typecheck test --filter=mainsite-web"
 
 [tasks.lint-workflows]
 description = "Lint GitHub Actions workflows with actionlint"
@@ -78,6 +121,8 @@ run = "actionlint"
 description = "Lint shell scripts with shellcheck"
 run = "shellcheck scripts/ci/*.sh scripts/setup scripts/setup_project"
 
+# --- The aggregate: run this before pushing --------------------------------
+
 [tasks.check]
-description = "Run all local gates (mirrors CI)"
-depends = ["lint-workflows", "lint-scripts", "check-api", "check-web"]
+description = "Run every local gate (mirrors CI). Run before pushing."
+depends = ["lint-workflows", "lint-scripts", "audit", "format-check", "check-web", "check-api"]

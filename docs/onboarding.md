@@ -144,8 +144,8 @@ Then:
 4. Wait. The first build takes a few minutes — it's downloading the box. Later opens are fast.
 5. When it's done, open a terminal inside VS Code (`` Ctrl+` ``) and run:
    ```bash
-   pnpm install
-   pnpm dev
+   mise run setup    # install dependencies + git hooks (first time only)
+   mise run dev      # start the website
    ```
 
 Jump to [section 5](#5-run-the-website-on-your-own-computer).
@@ -168,9 +168,9 @@ git clone https://github.com/vesperp4/mono.git
 cd mono
 mise trust && mise install       # reads mise.toml, installs every pinned tool
 
-# 4. Install the project's code dependencies, then start it
-pnpm install
-pnpm dev
+# 4. Install dependencies + git hooks, then start it
+mise run setup
+mise run dev
 ```
 
 > **What is `mise.toml`?** It's a file in the repo that lists every tool and its exact version
@@ -184,7 +184,7 @@ The full setup reference (devcontainer personalization, dotfiles, Git hooks) liv
 
 ## 5. Run the website on your own computer
 
-After `pnpm dev` finishes starting up, you'll see a line like:
+After `mise run dev` finishes starting up, you'll see a line like:
 
 ```
   ▲ Next.js 16
@@ -337,18 +337,21 @@ A deeper reference on branches, merge strategy, and the commit format is in
 
 ## 8. Useful commands
 
-Run these from the root `mono/` folder.
+**`mise` is the front door** — one tool runs every common task. Run these from the root
+`mono/` folder. Type `mise tasks` to see the full list with descriptions.
 
 | Command | What it does |
 | --- | --- |
-| `pnpm dev` | Start the website locally with hot reload. |
-| `pnpm build` | Build the production version (what CI does). Good for catching build errors. |
-| `pnpm lint` | Check the code style. CI runs this — run it before pushing. |
-| `pnpm typecheck` | Check that all the TypeScript types line up. |
-| `pnpm format` | Auto-format your code so it matches the project style. |
+| `mise run setup` | One-time: install dependencies and git hooks. |
+| `mise run dev` | Start the website locally with hot reload. |
+| `mise run build` | Build the production version (what CI does). Good for catching build errors. |
+| `mise run format` | Auto-format your code so it matches the project style. |
+| `mise run check` | Run **all** the CI checks locally. Do this before you push. |
+| `mise run db-up` / `db-down` | Start / stop a local Postgres (only needed for backend work). |
 
-If you set up with mise, you can also run `mise tasks` to see the project's local check
-commands (they mirror exactly what CI runs, so you can catch problems before opening a PR).
+Each `mise run` task just wraps the underlying tool (`pnpm`, `cargo`, etc.), so you can still
+call those directly if you prefer — but `mise run` means you don't have to remember which tool
+does what. Running `mise run check` before opening a PR catches almost everything CI would flag.
 
 ---
 
@@ -359,12 +362,12 @@ Breaking things is part of learning. Here's how to get unstuck.
 - **A command "isn't found" (e.g. `pnpm: command not found`).** Your tools aren't active.
   In a devcontainer, make sure you reopened *in the container*. With mise, make sure you ran
   `eval "$(mise activate bash)"` and reopened your terminal.
-- **`pnpm dev` errors about missing packages.** Run `pnpm install` first.
+- **`mise run dev` errors about missing packages.** Run `mise run setup` first.
 - **Your commit got rejected with a message about format.** Your commit message doesn't match
   Conventional Commits. Redo it: `git commit -m "fix: ..."`.
 - **CI is red on your PR.** Click "Details" next to the failing check on GitHub — it tells you
-  exactly which step failed. Often it's lint or types. Fix it locally (`pnpm lint`,
-  `pnpm typecheck`), commit, and push again.
+  exactly which step failed. Often it's lint or types. Reproduce it locally with
+  `mise run check`, fix it, commit, and push again.
 - **Totally lost / scared you broke something.** You almost certainly didn't — `main` is
   protected. Worst case, you can throw your branch away and start over from a clean `main`.
   When in doubt, **ask the team.** Everyone here was new once.
