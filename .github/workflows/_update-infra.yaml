@@ -7,7 +7,11 @@ on:
   workflow_call:
     inputs:
       image:
-        description: Image/app name (matches apps/<env>/<image>.bicepparam)
+        description: Image/component name (matches apps/<env>/<app_group>/<image>.bicepparam)
+        type: string
+        required: true
+      app_group:
+        description: App group / site the component belongs to (param subdir)
         type: string
         required: true
       tag:
@@ -64,7 +68,7 @@ jobs:
       - name: Pin image tag in bicepparam
         run: |
           bash actions-repo/scripts/ci/patch-bicepparam.sh \
-            "infra/apps/${{ inputs.environment }}/${{ inputs.image }}.bicepparam" \
+            "infra/apps/${{ inputs.environment }}/${{ inputs.app_group }}/${{ inputs.image }}.bicepparam" \
             "${{ inputs.tag }}"
 
       - name: Create or update PR
