@@ -90,13 +90,26 @@ pulls from ACR via **managed identity** (configured in the infra repo).
 
 ## Local parity (mise tasks)
 
+`mise` is the front door — run `mise tasks` for the full list. The gates below mirror CI:
+
 ```
-mise run db-up         # start a local Postgres (docker)
-mise run check-api     # fmt, clippy, cargo-deny, cargo-audit, tests + coverage
-mise run check-web     # lint, typecheck, vitest
+# everyday
+mise run setup         # install dependencies + git hooks (first time)
+mise run dev           # dev server(s), hot reload
+mise run build         # production build
+mise run format        # auto-format (Prettier)
+
+# quality gates (each mirrors a GitHub Actions check)
+mise run format-check  # pnpm turbo format-check
+mise run audit         # pnpm audit --prod
+mise run check-web     # lint, typecheck, test, build
+mise run check-api     # fmt, clippy, cargo-deny, cargo-audit, coverage (needs db-up)
 mise run lint-workflows # actionlint
 mise run lint-scripts   # shellcheck
-mise run check         # all of the above
+mise run check         # ALL of the above — run before pushing
+
+# local database (for API + integration tests)
+mise run db-up / db-down
 ```
 
 ---

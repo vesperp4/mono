@@ -23,15 +23,15 @@ The devcontainer provides a fully configured environment with Node.js, pnpm, and
 1. Clone the repo and open it in VS Code
 2. When prompted, click "Reopen in Container" (or run `Dev Containers: Reopen in Container` from the command palette)
 3. Wait for the container to build and `scripts/setup` to finish
-4. Run `pnpm install` then `pnpm dev`
+4. Run `mise run setup` then `mise run dev`
 
 **DevPod:**
 
 ```bash
 devpod up /path/to/mono
 ssh mono.devpod
-pnpm install
-pnpm dev
+mise run setup
+mise run dev
 ```
 
 ### Option B: Local setup with mise
@@ -48,14 +48,20 @@ eval "$(mise activate bash)"  # or zsh
 # Clone and setup
 git clone https://github.com/vesperp4/mono.git
 cd mono
-mise trust && mise install
-pnpm install
-pnpm dev
+mise trust && mise install   # install the pinned toolchain
+mise run setup               # install dependencies + git hooks
+mise run dev                 # start the dev server
 ```
 
 → App: [http://localhost:3000](http://localhost:3000)
 
-Devpod users get Git hooks wired automatically — the mise `enter` hook runs `scripts/setup_project` the first time you `cd` into the project. Local mise users activate them once with `pre-commit install --hook-type pre-commit --hook-type commit-msg`.
+**`mise` is the front door for every task.** Run `mise tasks` to list them all; the common
+ones are `mise run setup`, `mise run dev`, `mise run build`, `mise run format`, and
+`mise run check` (runs all CI gates locally). Each task just wraps the underlying tool
+(`pnpm`, `cargo`, …), so you can call those directly too.
+
+`mise run setup` also installs the Git hooks. (Devpod users get them wired automatically — the
+mise `enter` hook runs `scripts/setup_project` the first time you `cd` into the project.)
 
 > **Note:** Mise downloads tools from GitHub releases, which are rate-limited. If you rebuild containers frequently and hit rate limits, set a `GITHUB_TOKEN` environment variable with a personal access token (no permissions needed).
 
@@ -239,23 +245,25 @@ docs: add setup instructions to CONTRIBUTING
 ## Code Standards
 
 - **TypeScript strict mode** — no `any`, no unused variables
-- **ESLint** — run `pnpm turbo lint` before pushing; CI will catch violations
+- **ESLint** — run `mise run check` before pushing; CI will catch violations
 - **No direct pushes** to `dev` or `main` — always use a PR
 
 ---
 
 ## CI Checks
 
-Every PR must pass before merging:
+Every PR must pass before merging. **Run `mise run check` locally first** — it runs all of
+these (plus the Rust gate and workflow/script linting) exactly as CI does, so you catch
+failures before pushing.
 
-| Check         | What it runs                                |
+| Check         | Underlying command                          |
 | ------------- | ------------------------------------------- |
 | Lint          | `pnpm turbo lint`                           |
 | Typecheck     | `pnpm turbo typecheck`                      |
 | Format Check  | `pnpm turbo format-check`                   |
 | Build         | `pnpm turbo build`                          |
+| Dependency audit | `pnpm audit --prod`                      |
 | Commit messages | `cz check` validates all commit messages in the PR |
-| Source branch | Rejects PRs to `main` not coming from `dev` |
 
 ---
 
