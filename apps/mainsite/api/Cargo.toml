@@ -1,6 +1,6 @@
 [package]
 name = "mainsite-api"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 description = "Vesper P4 backend API"
 license = "MIT"
