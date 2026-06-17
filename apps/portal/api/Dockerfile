@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile:1
 
-FROM rust:1.94-slim AS builder
+# Pin the builder to Debian bookworm so the binary links against the same glibc
+# (2.36) as the distroless cc-debian12 runtime below. The unpinned `-slim` tag
+# now resolves to Debian trixie (glibc >= 2.38), and the native deps
+# (aws-lc-sys/ring, pulled in by the Azure SDK) reference 2.38 symbols — which
+# the bookworm runtime lacks ("GLIBC_2.38 not found"), so the binary won't start.
+FROM rust:1.94-slim-bookworm AS builder
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
