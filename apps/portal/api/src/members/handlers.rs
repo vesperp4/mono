@@ -18,10 +18,11 @@ pub async fn create_member(
 ) -> Result<(StatusCode, Json<StatusResponse>), AppError> {
     let member = validate_new_member(payload)?;
 
-    match repo::submit_member(&state.db, &member).await? {
+    match repo::submit_member(&state.db.load(), &member).await? {
         SubmitOutcome::NeedsVerification { member_id } => {
             let token =
-                repo::issue_token(&state.db, member_id, state.verification_ttl_hours).await?;
+                repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
+                    .await?;
             send_link(&state, &member.institutional_email, &token).await?;
         }
         SubmitOutcome::AlreadyActive => {
@@ -40,7 +41,7 @@ pub async fn confirm_member(
     State(state): State<AppState>,
     Json(payload): Json<ConfirmRequest>,
 ) -> Result<Json<StatusResponse>, AppError> {
-    if repo::confirm_token(&state.db, &payload.token).await? {
+    if repo::confirm_token(&state.db.load(), &payload.token).await? {
         Ok(Json(StatusResponse::new("active")))
     } else {
         Err(AppError::InvalidToken)
@@ -55,8 +56,9 @@ pub async fn resend_verification(
 ) -> Result<(StatusCode, Json<StatusResponse>), AppError> {
     let email = validate_institutional_email(&payload.institutional_email)?;
 
-    if let Some(member_id) = repo::pending_member_id(&state.db, &email).await? {
-        let token = repo::issue_token(&state.db, member_id, state.verification_ttl_hours).await?;
+    if let Some(member_id) = repo::pending_member_id(&state.db.load(), &email).await? {
+        let token =
+            repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours).await?;
         send_link(&state, &email, &token).await?;
     }
 
