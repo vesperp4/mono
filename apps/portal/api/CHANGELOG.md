@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/vesperp4/mono/compare/portal-api-v0.4.0...portal-api-v0.4.1) (2026-06-17)
+
+
+### Bug Fixes
+
+* **portal-api:** pin Docker builder to bookworm to match runtime glibc ([#134](https://github.com/vesperp4/mono/issues/134)) ([3aa72bb](https://github.com/vesperp4/mono/commit/3aa72bb0bd76224b412d07d5aefbe437658b50b0))
+
 ## [0.4.0](https://github.com/vesperp4/mono/compare/portal-api-v0.3.0...portal-api-v0.4.0) (2026-06-17)
 
 
