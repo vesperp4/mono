@@ -1,13 +1,12 @@
 # Vesper P4 — Website
 
 [![CI](https://github.com/vesperp4/mono/actions/workflows/ci.yml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/ci.yml)
-[![Deploy](https://github.com/vesperp4/mono/actions/workflows/deploy.yml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/deploy.yml)
+[![Deploy](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/vesperp4/mono/badge)](https://scorecard.dev/viewer/?uri=github.com/vesperp4/mono)
 
 Official website for the Vesper P4 graduate CS/engineering chapter at Polytechnic University of Puerto Rico.
 
 **Production** → [vesperp4.com](https://vesperp4.com)
-**Staging** → [dev--chapter.azurestaticapps.net](https://dev--chapter.azurestaticapps.net)
 
 ---
 
@@ -47,12 +46,13 @@ pnpm dev
 ```
 apps/
   mainsite/         Main site (web frontend + api)
-    web/            Web frontend (Next.js)
+    web/            Web frontend (Next.js) → Azure Static Web Apps
       src/
         app/        App Router pages and layouts
         components/ UI components (ui/, layout/, sections/, common/)
         lib/        Sanity client, GROQ queries, utilities
         types/      Shared TypeScript types + generated Sanity types
+    api/            Rust (Axum + sqlx) backend → Azure Container Apps
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
   eslint-config/    Shared ESLint config
@@ -68,11 +68,10 @@ Full reference → [docs/project-structure.md](./docs/project-structure.md)
 ## Development Workflow
 
 ```
-feat/* or fix/*  →  PR to dev  →  staging  →  PR to main  →  production
+feat/* or fix/*  →  PR to main  →  production
 ```
 
-- Branch off `dev`, never `main`
-- PRs to `main` must come from `dev` only
+- Trunk-based: branch off `main`, open a PR back to `main`
 - CI must pass (lint, typecheck, build) before merge
 - 1 approval required on all PRs
 
