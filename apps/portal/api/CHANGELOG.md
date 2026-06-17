@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/vesperp4/mono/compare/portal-api-v0.4.1...portal-api-v0.5.0) (2026-06-17)
+
+
+### Features
+
+* **portal-api:** refresh the Entra DB token for long-lived replicas ([#136](https://github.com/vesperp4/mono/issues/136)) ([a654254](https://github.com/vesperp4/mono/commit/a654254e32cad6a2d337df240891581eb47e470b))
+
 ## [0.4.1](https://github.com/vesperp4/mono/compare/portal-api-v0.4.0...portal-api-v0.4.1) (2026-06-17)
 
 
