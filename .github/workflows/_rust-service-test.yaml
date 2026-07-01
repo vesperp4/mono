@@ -1,7 +1,13 @@
 name: Rust Service Tests
 
-# Reusable quality gate for a Rust service: format, lint, security audits,
-# tests against a real Postgres, coverage, and a container vulnerability scan.
+# Reusable quality gate for a Rust service: format, lint, dependency policy
+# (bans/licenses/sources), tests against a real Postgres, coverage, and a
+# container vulnerability scan.
+#
+# Deliberately excluded: RustSec advisory checks. Advisories are a property of
+# time (a new advisory can be published against an unchanged lockfile), so they
+# run in the scheduled security workflow (portal-api-security.yaml) instead of
+# blocking unrelated PRs here.
 on:
   workflow_call:
     inputs:
@@ -54,7 +60,7 @@ jobs:
 
       - uses: taiki-e/install-action@15449e3094499af05d8d964a1c884208e4b8b595 # v2.81.11
         with:
-          tool: cargo-llvm-cov,cargo-deny,cargo-audit
+          tool: cargo-llvm-cov,cargo-deny
 
       - name: Format check
         run: cargo fmt --all --check
@@ -62,13 +68,11 @@ jobs:
       - name: Lint (clippy)
         run: cargo clippy --all-targets --all-features -- -D warnings
 
-      - name: Dependency advisories, bans & licenses (cargo-deny)
-        run: cargo deny check
-
-      - name: Vulnerability audit (cargo-audit)
-        # Accepted/unfixed advisories are listed (with justifications) in
-        # apps/portal/api/.cargo/audit.toml, which cargo-audit reads automatically.
-        run: cargo audit
+      - name: Dependency bans, licenses & sources (cargo-deny)
+        # Deterministic checks only — these can only fail when the PR itself
+        # changes the dependency tree. Advisory checks run on a schedule in
+        # portal-api-security.yaml.
+        run: cargo deny check bans licenses sources
 
       - name: Tests with coverage
         # TODO(dev-team): enable a threshold once real tests land, e.g. add

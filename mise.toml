@@ -32,7 +32,6 @@ cosign = "latest"
 
 # Rust CI helpers (cargo-installed binaries).
 "cargo:cargo-deny" = "latest"
-"cargo:cargo-audit" = "latest"
 "cargo:cargo-llvm-cov" = "latest"
 "cargo:sqlx-cli" = "latest"
 
@@ -104,7 +103,7 @@ description = "portal-web gate: lint, typecheck, test, build (mirrors portal-web
 run = "pnpm turbo lint typecheck test build --filter=portal-web"
 
 [tasks.check-portal-api]
-description = "API gate: fmt, clippy, deny, audit, coverage (mirrors _rust-service-test.yaml). Needs `mise run db-up`."
+description = "API gate: fmt, clippy, deny (bans/licenses/sources), coverage (mirrors _rust-service-test.yaml). Needs `mise run db-up`."
 dir = "apps/portal/api"
 shell = "bash -c"
 env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
@@ -112,10 +111,14 @@ run = """
 set -euo pipefail
 cargo fmt --all --check
 cargo clippy --all-targets --all-features -- -D warnings
-cargo deny check
-cargo audit
+cargo deny check bans licenses sources
 cargo llvm-cov --all-features --workspace
 """
+
+[tasks.audit-portal-api]
+description = "API advisory scan: RustSec advisories via cargo-deny (mirrors portal-api-security.yaml)"
+dir = "apps/portal/api"
+run = "cargo deny check advisories"
 
 [tasks.lint-workflows]
 description = "Lint GitHub Actions workflows with actionlint"

@@ -34,6 +34,13 @@ updates:
       cargo:
         patterns:
           - "*"
+      # Group Dependabot *security* PRs too (requires "Dependabot security
+      # updates" enabled in repo settings). Security updates can patch
+      # transitive, lockfile-only deps that version updates never touch.
+      cargo-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
     ignore:
       # These majors carry breaking API changes that need a deliberate code
       # migration (rand 0.9+ renamed thread_rng()/moved RngCore; sha2 0.11 and
