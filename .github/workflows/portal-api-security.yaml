@@ -1,0 +1,101 @@
+name: Portal API Security Scan
+
+# Time-dependent security checks, decoupled from PR CI: a new RustSec advisory
+# or base-image CVE can appear against an unchanged lockfile, so these run on a
+# daily schedule (plus pushes to main that touch the dependency tree) instead
+# of blocking unrelated PRs. PR CI (_rust-service-test.yaml) keeps only the
+# deterministic checks.
+on:
+  schedule:
+    # Daily, offset from the weekly Scorecard (Mon) and CodeQL (Tue) runs.
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps/portal/api/Cargo.toml"
+      - "apps/portal/api/Cargo.lock"
+      - "apps/portal/api/deny.toml"
+      - "apps/portal/api/Dockerfile"
+      - ".github/workflows/portal-api-security.yaml"
+
+concurrency:
+  group: portal-api-security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  advisories:
+    name: RustSec advisories (cargo-deny)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # open/update the tracking issue on failure
+    defaults:
+      run:
+        working-directory: apps/portal/api
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install pinned Rust toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+
+      - uses: taiki-e/install-action@15449e3094499af05d8d964a1c884208e4b8b595 # v2.81.11
+        with:
+          tool: cargo-deny
+
+      - name: Check RustSec advisories
+        # Accepted advisories are listed (with justifications) in the
+        # [advisories.ignore] section of apps/portal/api/deny.toml.
+        run: cargo deny check advisories
+
+      - name: Open or update tracking issue
+        if: failure()
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="portal-api: RustSec advisory check failing"
+          body="The scheduled security scan found one or more RustSec advisories affecting \`apps/portal/api\`.
+
+          Failing run: $RUN_URL
+
+          Triage options:
+          - Upgrade the affected dependency (\`cargo update -p <crate>\` for lockfile-only fixes, or wait for the Dependabot security PR).
+          - If no fix exists and our usage is not affected, add a documented \`ignore\` entry to \`apps/portal/api/deny.toml\`."
+          number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+  image-scan:
+    name: Container image scan (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # upload Trivy findings to the Security tab
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Build image for scanning
+        run: docker build -t portal-api:scan apps/portal/api
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: portal-api:scan
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: sarif
+          output: trivy-portal-api.sarif
+
+      - name: Upload scan results to the Security tab
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v3
+        with:
+          sarif_file: trivy-portal-api.sarif
+          category: trivy-portal-api

@@ -47,7 +47,8 @@ feat/* | fix/* | ci/* | chore/*
 | `ci.yml` | PR, push `main` | Repo-wide: commit-msg, `pnpm audit`, format-check, lint/typecheck/build |
 | `mainsite-web-test.yaml` | PR, push `main` | Path-filtered web tests (Vitest) + `web-required` gate |
 | `portal-api-test.yaml` | PR, push `main` | Path-filtered API gate → calls `_rust-service-test.yaml`; `api-required` gate |
-| `_rust-service-test.yaml` | `workflow_call` | fmt, clippy, cargo-deny, cargo-audit, tests + coverage against Postgres, Trivy image scan |
+| `_rust-service-test.yaml` | `workflow_call` | fmt, clippy, cargo-deny (bans/licenses/sources), tests + coverage against Postgres, Trivy image scan |
+| `portal-api-security.yaml` | daily, push `main` (dep paths), dispatch | RustSec advisories (cargo-deny) + Trivy scan → Security tab; opens a tracking issue on new advisories |
 | `portal-api-build.yaml` | tag `portal-api-v*` | Build + push image to ACR (provenance + SBOM), cosign sign, trigger infra dev bump |
 | `_update-infra.yaml` | `workflow_call` | Open/auto-merge a PR in the infra repo pinning the image tag for an environment |
 | `portal-api-promote-prod.yaml` | manual dispatch | Approval-gated promotion of the dev tag to prod (via `_update-infra.yaml`) |
@@ -104,7 +105,8 @@ mise run format-check  # pnpm turbo format-check
 mise run audit         # pnpm audit --prod
 mise run check-mainsite-web # lint, typecheck, test, build (mainsite-web)
 mise run check-portal-web   # lint, typecheck, test, build (portal-web)
-mise run check-portal-api   # fmt, clippy, cargo-deny, cargo-audit, coverage (needs db-up)
+mise run check-portal-api   # fmt, clippy, cargo-deny bans/licenses/sources, coverage (needs db-up)
+mise run audit-portal-api   # RustSec advisory scan (mirrors portal-api-security.yaml)
 mise run lint-workflows # actionlint
 mise run lint-scripts   # shellcheck
 mise run check         # ALL of the above — run before pushing
