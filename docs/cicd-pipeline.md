@@ -58,6 +58,7 @@ feat/* | fix/* | ci/* | chore/*
 | `scorecard.yml` | weekly, push `main` | OpenSSF Scorecard |
 | `mainsite-web-deploy.yaml` | push `main` (web paths), dispatch | Build + upload web content to Azure SWA (production) |
 | `pr-title.yml` | PR | Semantic PR title check |
+| `dependabot-automerge.yaml` | Dependabot PRs, push `main` | Queue auto-merge for patch/minor Dependabot PRs; keep queued PRs up to date with main |
 
 Reusable workflows are prefixed `_`. Project-specific workflows are named
 `mainsite-<service>-<purpose>.yaml`.
@@ -83,6 +84,7 @@ safe to mark **required**: `Mainsite API Test / api-required`, `Mainsite Web Tes
 | `INFRA_APP_ID` / `INFRA_APP_KEY` | secret | `_update-infra.yaml`, promote | GitHub App that can open PRs in the infra repo |
 | `INFRA_REPO_NAME` | variable | `_update-infra.yaml`, promote | Infra repo name (e.g. `infra`) |
 | `RELEASE_PLEASE_TOKEN` | secret | `release-please.yaml` | PAT/App token so release tags trigger the build workflow (GITHUB_TOKEN would not) |
+| `AUTOMERGE_TOKEN` | secret (Actions **and** Dependabot stores) | `dependabot-automerge.yaml` | PAT with contents+PR write so branch updates re-run CI and auto-merges trigger main workflows |
 
 The Azure OIDC login uses a **federated credential** (no stored client secret). Container Apps
 pulls from ACR via **managed identity** (configured in the infra repo).

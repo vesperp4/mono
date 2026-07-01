@@ -1,0 +1,69 @@
+name: Dependabot Auto-merge
+
+# Queues auto-merge for low-risk Dependabot PRs (semver patch/minor across all
+# ecosystems — majors always wait for a human), and keeps queued PRs current
+# with main so the "require branches up to date" rule doesn't strand them.
+# Auto-merge itself waits for the required status checks, so nothing red lands.
+#
+# Setup (one-time, repo admin): create a fine-grained PAT (or GitHub App token)
+# with contents:write + pull-requests:write and store it as AUTOMERGE_TOKEN in
+# BOTH secret stores:
+#   - Actions secrets   (used by the update-stale job)
+#   - Dependabot secrets (used by the automerge job — Dependabot-triggered
+#     workflows can only read Dependabot secrets)
+# The default GITHUB_TOKEN cannot be used here: pushes and merges made with it
+# do not trigger other workflows, which would skip PR re-checks after a branch
+# update and skip deploy/release-please/security-scan after the merge to main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Queue auto-merge on eligible Dependabot PRs.
+  automerge:
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Queue auto-merge (patch/minor only)
+        # For grouped PRs, update-type reports the highest bump in the group,
+        # so one major in a group correctly disqualifies the whole PR.
+        if: steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
+        run: gh pr merge --squash --auto "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}"
+
+  # After every merge to main, bring stale auto-merge-queued Dependabot PRs
+  # back up to date (auto-merge does not update branches by itself).
+  update-stale:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Update stale Dependabot PRs with auto-merge queued
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
+        run: |
+          sleep 20 # let GitHub recompute merge states after the push
+          gh pr list --repo "$GITHUB_REPOSITORY" --author 'app/dependabot' --state open \
+            --json number,mergeStateStatus,autoMergeRequest \
+            --jq '.[] | select(.autoMergeRequest != null and .mergeStateStatus == "BEHIND") | .number' |
+          while read -r pr; do
+            echo "Updating branch of PR #$pr"
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$pr/update-branch" || true
+          done
