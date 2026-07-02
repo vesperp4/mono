@@ -4,15 +4,17 @@
 [![Mainsite Deploy](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml)
 [![Portal Deploy](https://github.com/vesperp4/mono/actions/workflows/portal-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/portal-web-deploy.yaml)
 [![Portal API Build](https://github.com/vesperp4/mono/actions/workflows/portal-api-build.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/portal-api-build.yaml)
+[![TV Engine Build](https://github.com/vesperp4/mono/actions/workflows/tv-engine-build.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/tv-engine-build.yaml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/vesperp4/mono/badge)](https://scorecard.dev/viewer/?uri=github.com/vesperp4/mono)
 
-Official website and member portal for the Vesper P4 graduate CS/engineering chapter at
-Polytechnic University of Puerto Rico.
+Official website, member portal, and 24/7 streaming channel for the Vesper P4 graduate
+CS/engineering chapter at Polytechnic University of Puerto Rico.
 
-| App               | Production                                       | Dev                                                        |
-| ----------------- | ------------------------------------------------ | ---------------------------------------------------------- |
-| **Main site**     | [vesperp4.com](https://vesperp4.com)             | [dev.vesperp4.com](https://dev.vesperp4.com)               |
+| App               | Production                                         | Dev                                                        |
+| ----------------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| **Main site**     | [vesperp4.com](https://vesperp4.com)               | [dev.vesperp4.com](https://dev.vesperp4.com)               |
 | **Member portal** | [portal.vesperp4.com](https://portal.vesperp4.com) | [portal.dev.vesperp4.com](https://portal.dev.vesperp4.com) |
+| **TV**            | vesperp4.tv — launch pending ([#166](https://github.com/vesperp4/mono/issues/166)) | [dev.vesperp4.tv](https://dev.vesperp4.tv)                 |
 
 ---
 
@@ -22,10 +24,11 @@ Polytechnic University of Puerto Rico.
 | ---------------- | ---------------------------------------------- |
 | Frontend         | Next.js 16+ (App Router), TypeScript (strict)  |
 | Styling          | Tailwind CSS v4 + shadcn/ui                    |
-| CMS (Phase 2)    | Sanity v3                                      |
+| CMS              | Sanity v3 (Phase 2 content; TV schedule)       |
 | Backend (portal) | Rust — Axum + sqlx                             |
 | Database         | Azure Database for PostgreSQL Flexible Server  |
 | Email            | Azure Communication Services                   |
+| Streaming (TV)   | Eyevinn Channel Engine (VOD2Live) + ffmpeg HLS packaging + hls.js |
 | Web hosting      | Azure Static Web Apps                          |
 | API hosting      | Azure Container Apps (images in ACR)           |
 | Auth (planned)   | Microsoft OIDC SSO + magic-link fallback       |
@@ -76,6 +79,10 @@ apps/
   portal/api/       Members API (Rust: Axum + sqlx) → Azure Container Apps
     src/            Service code (router, members domain, email, db)
     migrations/     sqlx migrations
+  tv/web/           TV site (Next.js + hls.js player) → vesperp4.tv
+  tv/engine/        24/7 playout service (Eyevinn Channel Engine) → Azure Container Apps
+  tv/packager/      ffmpeg HLS packaging job (per upload) → Container Apps Job
+  tv/studio/        Sanity Studio — the TV schedule admin (separate Sanity project)
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
   eslint-config/    Shared ESLint config
@@ -85,6 +92,9 @@ packages/
 
 The main site is content-only and makes no API calls. Everything membership-related
 (signup, sign-in, email confirmation) lives on the portal, backed by `portal-api`.
+The TV apps form their own pipeline — recordings are packaged to HLS once, and the
+engine stitches them into a continuous channel driven by the Sanity schedule
+(design: [docs/tv-architecture.md](./docs/tv-architecture.md)).
 
 Full reference → [docs/project-structure.md](./docs/project-structure.md)
 
@@ -99,9 +109,9 @@ feat/* or fix/*  →  PR to main  →  production
 - Trunk-based: branch off `main`, open a PR back to `main`
 - CI must pass (lint, typecheck, build) before merge
 - 1 approval required on all PRs
-- Web apps deploy straight from `main`; `portal-api` releases via release-please —
-  merging its release PR builds and signs the container image, deploys to dev
-  automatically, and prod promotion is approval-gated
+- Web apps deploy straight from `main`; `portal-api`, `tv-engine`, and `tv-packager`
+  release via release-please — merging a release PR builds and signs the container
+  image, deploys to dev automatically, and prod promotion is approval-gated
 
 Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
 
@@ -111,17 +121,20 @@ Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
 
 Editorial content (blog, events, team roster) moves to **Sanity Studio** in Phase 2 —
 content editors won't need to touch the codebase. Member data is not content: it lives
-in PostgreSQL, owned by `portal-api`.
+in PostgreSQL, owned by `portal-api`. The TV channel's schedule and catalog live in a
+**separate Sanity project** ("VesperP4 TV"), edited in `apps/tv/studio` — the TV site
+itself has no login.
 
 ---
 
 ## Roadmap
 
-| Phase | Scope                                                          | Status         |
-| ----- | -------------------------------------------------------------- | -------------- |
-| **1** | Public showcase — landing, about, team, projects, contact      | 🚧 In progress |
-| **2** | Events listing + blog (Sanity CMS)                             | 📋 Planned     |
-| **3** | Member portal — email-verified signup live; SSO sign-in next   | 🚧 In progress |
+| Phase  | Scope                                                          | Status         |
+| ------ | -------------------------------------------------------------- | -------------- |
+| **1**  | Public showcase — landing, about, team, projects, contact      | 🚧 In progress |
+| **2**  | Events listing + blog (Sanity CMS)                             | 📋 Planned     |
+| **3**  | Member portal — email-verified signup live; SSO sign-in next   | 🚧 In progress |
+| **TV** | 24/7 streaming channel → vesperp4.tv ([tracking #166](https://github.com/vesperp4/mono/issues/166)) | 🚧 Dev on air  |
 
 ---
 
