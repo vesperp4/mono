@@ -56,8 +56,8 @@ whole system in plain language:
   there.
 
 For **Phase 1** (where we are now), the website is mostly frontend. The backend and database
-exist but are still being wired up. **So if you're new, you'll almost certainly be working in
-`web/`.**
+power the member portal and mostly run themselves. **So if you're new, you'll almost certainly
+be working in `apps/mainsite/web/`.**
 
 ---
 
@@ -73,9 +73,11 @@ have to keep track of:
 ```
 mono/                  ← the whole backpack (the repository)
 ├── apps/
-│   └── mainsite/
-│       ├── web/       ← the frontend (Next.js) — you'll spend most time here
-│       └── api/       ← the backend (Rust)
+│   ├── mainsite/
+│   │   └── web/       ← the public site (Next.js) — you'll spend most time here
+│   └── portal/
+│       ├── web/       ← the member portal (Next.js)
+│       └── api/       ← the members backend (Rust)
 ├── packages/          ← settings shared by multiple apps
 ├── docs/              ← documentation (you're reading one of these)
 └── ...config files...
@@ -196,7 +198,7 @@ machine. `localhost` means "this computer," and `3000` is the port number Next.j
 
 This is your sandbox. Now try this:
 
-1. Open `apps/mainsite/web/src/app/page.tsx` in your editor.
+1. Open `apps/mainsite/web/app/page.tsx` in your editor.
 2. Find some visible text and change it.
 3. Save the file.
 4. Look back at your browser — **it updates instantly**, no refresh needed. That's called
@@ -214,20 +216,17 @@ local. 🎉
 You don't need to memorize this. Use it as a "where do I go to change X?" lookup.
 
 ```
-apps/mainsite/web/src/
+apps/mainsite/web/
 ├── app/                  ← the PAGES of the site, one folder per URL
 │   ├── page.tsx          → the home page  (vesperp4.com/)
-│   ├── about/page.tsx    → the about page (vesperp4.com/about)
-│   ├── team/page.tsx     → the team page  (vesperp4.com/team)
 │   ├── layout.tsx        → the shell wrapped around every page (header, footer)
 │   └── globals.css       → site-wide styling
-├── components/           ← reusable building blocks
-│   ├── ui/               → small primitives (buttons, cards)
-│   ├── layout/           → header, footer, nav
-│   ├── sections/         → big page chunks (hero banner, etc.)
-│   └── common/           → bits shared across pages
+│                           (new pages, e.g. about/page.tsx → vesperp4.com/about,
+│                            get added here as Phase 1 progresses)
+├── components/           ← reusable building blocks (hero, navbar, cards, …)
+│   └── ui/               → small primitives (buttons, badges)
 ├── lib/                  → helper code and data-fetching (mostly Phase 2+)
-└── types/                → shared TypeScript type definitions
+└── public/               → images and other static files
 ```
 
 Rules of thumb:
@@ -297,7 +296,7 @@ git diff          # shows the exact lines you changed
 it with a message:
 
 ```bash
-git add apps/mainsite/web/src/app/about/page.tsx
+git add apps/mainsite/web/app/about/page.tsx
 git commit -m "fix: correct typo on about page"
 ```
 
