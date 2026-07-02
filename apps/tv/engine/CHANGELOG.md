@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.0...tv-engine-v0.2.1) (2026-07-02)
+
+
+### Bug Fixes
+
+* **tv:** use legacy pnpm deploy in tv-engine Dockerfile ([#156](https://github.com/vesperp4/mono/issues/156)) ([caa3346](https://github.com/vesperp4/mono/commit/caa33464cd1ca404ebe43ea6a0de10f457a1bf90))
+
 ## [0.2.0](https://github.com/vesperp4/mono/compare/tv-engine-v0.1.0...tv-engine-v0.2.0) (2026-07-02)
 
 
