@@ -8,7 +8,7 @@ import { schemaTypes } from "./schemas";
 // project from the Phase 2 mainsite CMS — the TV site is its own product.
 export default defineConfig({
   name: "vesperp4-tv",
-  title: "Vesper P4 TV",
+  title: "VesperP4 TV",
   projectId: process.env.SANITY_STUDIO_PROJECT_ID ?? "uphuxt07",
   dataset: process.env.SANITY_STUDIO_DATASET ?? "production",
   plugins: [structureTool()],
