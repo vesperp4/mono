@@ -1,7 +1,7 @@
 // Read-only GROQ queries against the TV Sanity project (public dataset, no
 // token). Uses plain fetch instead of @sanity/client to keep the bundle lean.
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "";
+const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "uphuxt07";
 const DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
 const API_VERSION = "v2024-01-01";
 
