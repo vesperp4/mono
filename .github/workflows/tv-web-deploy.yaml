@@ -1,0 +1,70 @@
+name: tv-web Deploy
+
+# Builds the TV frontend and uploads it to the infra-managed Azure Static Web
+# App (tv-web-prod, serving vesperp4.tv) using its deployment token. The SWA
+# resource is provisioned in the infra repo, not here.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/tv/web/**'
+      - '.github/workflows/tv-web-deploy.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: tv-web-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Azure Static Web Apps
+    runs-on: ubuntu-latest
+
+    # Scoped to the azure-swa-tv environment, which holds the TV site's
+    # AZURE_STATIC_WEB_APPS_API_TOKEN (mirrors azure-swa for mainsite).
+    environment: azure-swa-tv
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          submodules: true
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Cache Turbo
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo build --filter=tv-web
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          TURBO_CACHE_DIR: .turbo
+          NEXT_PUBLIC_CHANNEL_HLS_URL: ${{ vars.TV_CHANNEL_HLS_URL }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.TV_SANITY_PROJECT_ID }}
+
+      - name: Deploy
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: apps/tv/web
+          output_location: .next
+          skip_app_build: true
