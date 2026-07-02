@@ -19,6 +19,24 @@
       "component": "portal-web",
       "include-component-in-tag": true,
       "changelog-path": "CHANGELOG.md"
+    },
+    "apps/tv/web": {
+      "release-type": "node",
+      "component": "tv-web",
+      "include-component-in-tag": true,
+      "changelog-path": "CHANGELOG.md"
+    },
+    "apps/tv/engine": {
+      "release-type": "node",
+      "component": "tv-engine",
+      "include-component-in-tag": true,
+      "changelog-path": "CHANGELOG.md"
+    },
+    "apps/tv/packager": {
+      "release-type": "simple",
+      "component": "tv-packager",
+      "include-component-in-tag": true,
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }

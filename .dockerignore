@@ -1,0 +1,7 @@
+# Root-context Docker builds (tv-engine) — keep the build context lean.
+node_modules
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+.git

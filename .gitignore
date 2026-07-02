@@ -25,3 +25,5 @@ pnpm-debug.log*
 # devpod
 .devpod-internal/
 .pnpm-store/
+# sanity studio local runtime cache
+.sanity/
