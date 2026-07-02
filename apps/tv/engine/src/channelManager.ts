@@ -13,11 +13,14 @@ export class SanityChannelManager implements IChannelManager {
     ];
   }
 
+  // Values match the packager's actual ffmpeg output (verified against the
+  // first packaged asset's master.m3u8) — including 480p at level 3.1
+  // (avc1.4d401f), which ffmpeg selects despite the sub-720p resolution.
   private profile(): ChannelProfile[] {
     return [
-      { bw: 5500000, codecs: "avc1.4d4028,mp4a.40.2", resolution: [1920, 1080] },
-      { bw: 3300000, codecs: "avc1.4d401f,mp4a.40.2", resolution: [1280, 720] },
-      { bw: 1400000, codecs: "avc1.4d401e,mp4a.40.2", resolution: [854, 480] },
+      { bw: 5640800, codecs: "avc1.4d4028,mp4a.40.2", resolution: [1920, 1080] },
+      { bw: 3440800, codecs: "avc1.4d401f,mp4a.40.2", resolution: [1280, 720] },
+      { bw: 1460800, codecs: "avc1.4d401f,mp4a.40.2", resolution: [854, 480] },
     ];
   }
 }
