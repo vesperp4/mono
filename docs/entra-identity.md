@@ -200,11 +200,48 @@ Intentional omissions; do not "add" them without thinking through cost / complex
 | Federated identity for GitHub Actions → Azure | Separate work item. Today the SWA deploys with `AZURE_STATIC_WEB_APPS_API_TOKEN` (a long-lived deploy token). Worth adding when a backend ships that needs to call Azure-managed services, per <https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust-github>. |
 | User onboarding / offboarding runbook | Not written yet. When the org grows past founding-team scale, add a checklist file under this dir covering: invite (admin-only now), add to relevant groups, MFA registration verification, removal on departure. |
 | Custom Entra ID company branding | Cosmetic; deferred. |
-| Service principal management for the website / future apps | None today (the SWA token is a Microsoft-managed credential, not an SP). When future workloads need to call Azure services, create per-workload managed identities, not shared SPs. |
+| Service principal management for the website / future apps | Per-workload managed identities only, no shared SPs. The one app registration that exists (member-portal sign-in, §8) authenticates with a managed-identity federated credential — still zero client secrets. |
 
 ---
 
-## 8. Refs
+## 8. App registrations
+
+One registration exists: **VESPER P4 Member Portal** — the OIDC client for member
+sign-in on `portal.vesperp4.com` (mono#171).
+
+| Field | Value |
+|---|---|
+| Display name | `VESPER P4 Member Portal` |
+| appId (`OIDC_CLIENT_ID`) | `aa2064af-8e60-40ab-8be8-28fa7ccd6ca1` |
+| Object ID | `ba37d432-9649-4f1d-8f1c-3b21909ef744` |
+| Sign-in audience | `AzureADMultipleOrgs` (multi-tenant) |
+| Redirect URIs (Web) | `https://api.portal.vesperp4.com/api/v1/auth/oidc/callback`, `https://api.portal.dev.vesperp4.com/api/v1/auth/oidc/callback`, `http://localhost:8080/api/v1/auth/oidc/callback` |
+| Optional claims | `email` on the ID token |
+| API permissions | OIDC scopes only (`openid profile email`) — no Graph |
+
+Design notes:
+
+- **Multi-tenant on purpose, but only PUPR signs in.** Members authenticate with
+  their university (PUPR) Microsoft 365 accounts, so the app must accept other
+  tenants. `portal-api` pins the token endpoints to PUPR's tenant
+  (`72b8c91b-4089-4b60-996f-922c73865584`) and enforces `iss` + `tid` server-side
+  — a vesperp4.com or personal account can never mint a portal session.
+- **No client secret.** The token-endpoint credential is a **federated identity
+  credential** per environment: the Container App managed identities `id-app-dev`
+  / `id-app-prod` exchange their own Entra token (audience
+  `api://AzureADTokenExchange`) as the `client_assertion`. Nothing to rotate.
+- **PUPR-side consent:** the service principal is provisioned in PUPR's tenant on
+  first sign-in if their policy allows user consent for the basic OIDC scopes. If
+  PUPR requires admin consent, send their IT the admin-consent URL:
+  `https://login.microsoftonline.com/72b8c91b-4089-4b60-996f-922c73865584/adminconsent?client_id=aa2064af-8e60-40ab-8be8-28fa7ccd6ca1`.
+  The magic-link sign-in path works regardless.
+
+Runbook for reproducing/extending this setup lives in the infra repo README
+(§"portal-api custom domain + Entra app registration (out-of-band)").
+
+---
+
+## 9. Refs
 
 - Entra ID overview: <https://learn.microsoft.com/en-us/entra/fundamentals/whatis>
 - Feature availability matrix (Free vs P1 vs P2): <https://learn.microsoft.com/en-us/entra/fundamentals/feature-availability>

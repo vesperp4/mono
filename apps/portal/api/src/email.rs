@@ -8,6 +8,9 @@ use async_trait::async_trait;
 pub trait EmailSender: Send + Sync {
     /// Send the membership verification link to an institutional address.
     async fn send_verification(&self, to: &str, link: &str) -> anyhow::Result<()>;
+
+    /// Send a one-time sign-in (magic) link to an institutional address.
+    async fn send_login_link(&self, to: &str, link: &str) -> anyhow::Result<()>;
 }
 
 /// Stub sender used until a real provider is wired: logs the link instead of
@@ -23,6 +26,16 @@ impl EmailSender for LogEmailSender {
             to,
             link,
             "verification email (LogEmailSender — not actually sent)"
+        );
+        Ok(())
+    }
+
+    async fn send_login_link(&self, to: &str, link: &str) -> anyhow::Result<()> {
+        tracing::info!(
+            target: "email",
+            to,
+            link,
+            "sign-in link email (LogEmailSender — not actually sent)"
         );
         Ok(())
     }
@@ -46,7 +59,6 @@ pub struct AcsEmailSender {
     endpoint: String,
     /// Verified sender, e.g. `DoNotReply@<guid>.azurecomm.net`.
     sender_address: String,
-    subject: String,
     http: reqwest::Client,
 }
 
@@ -58,7 +70,6 @@ impl AcsEmailSender {
         Ok(Self {
             endpoint: endpoint.trim_end_matches('/').to_string(),
             sender_address,
-            subject: "Confirm your Vesper P4 membership".to_string(),
             http,
         })
     }
@@ -85,36 +96,26 @@ impl AcsEmailSender {
 
         Ok(token.token.secret().to_string())
     }
-}
 
-#[async_trait]
-impl EmailSender for AcsEmailSender {
-    async fn send_verification(&self, to: &str, link: &str) -> anyhow::Result<()> {
+    /// POST one message to the ACS Email send API.
+    async fn send(
+        &self,
+        to: &str,
+        subject: &str,
+        plain_text: &str,
+        html: &str,
+    ) -> anyhow::Result<()> {
         let token = self.access_token().await?;
         let url = format!(
             "{}/emails:send?api-version={}",
             self.endpoint, ACS_API_VERSION
         );
 
-        let plain_text = format!(
-            "Welcome to Vesper P4!\n\n\
-             Confirm your membership by opening this link:\n{link}\n\n\
-             The link expires after a while; if it has, just request a new one.\n\
-             If you didn't sign up, you can ignore this email."
-        );
-        let html = format!(
-            "<p>Welcome to Vesper P4!</p>\
-             <p>Confirm your membership by clicking the link below:</p>\
-             <p><a href=\"{link}\">Confirm my membership</a></p>\
-             <p>The link expires after a while; if it has, just request a new one. \
-             If you didn't sign up, you can ignore this email.</p>"
-        );
-
         let body = serde_json::json!({
             "senderAddress": self.sender_address,
             "recipients": { "to": [ { "address": to } ] },
             "content": {
-                "subject": self.subject,
+                "subject": subject,
                 "plainText": plain_text,
                 "html": html,
             }
@@ -143,7 +144,46 @@ impl EmailSender for AcsEmailSender {
             anyhow::bail!("ACS email send failed ({status}): {detail}");
         }
 
-        tracing::info!(target: "email", to, "verification email accepted by ACS");
+        tracing::info!(target: "email", to, subject, "email accepted by ACS");
         Ok(())
+    }
+}
+
+#[async_trait]
+impl EmailSender for AcsEmailSender {
+    async fn send_verification(&self, to: &str, link: &str) -> anyhow::Result<()> {
+        let plain_text = format!(
+            "Welcome to Vesper P4!\n\n\
+             Confirm your membership by opening this link:\n{link}\n\n\
+             The link expires after a while; if it has, just request a new one.\n\
+             If you didn't sign up, you can ignore this email."
+        );
+        let html = format!(
+            "<p>Welcome to Vesper P4!</p>\
+             <p>Confirm your membership by clicking the link below:</p>\
+             <p><a href=\"{link}\">Confirm my membership</a></p>\
+             <p>The link expires after a while; if it has, just request a new one. \
+             If you didn't sign up, you can ignore this email.</p>"
+        );
+
+        self.send(to, "Confirm your Vesper P4 membership", &plain_text, &html)
+            .await
+    }
+
+    async fn send_login_link(&self, to: &str, link: &str) -> anyhow::Result<()> {
+        let plain_text = format!(
+            "Sign in to Vesper P4 by opening this link:\n{link}\n\n\
+             The link expires in about 15 minutes and can only be used once.\n\
+             If you didn't request this, you can ignore this email."
+        );
+        let html = format!(
+            "<p>Sign in to Vesper P4 by clicking the link below:</p>\
+             <p><a href=\"{link}\">Sign in to Vesper P4</a></p>\
+             <p>The link expires in about 15 minutes and can only be used once. \
+             If you didn't request this, you can ignore this email.</p>"
+        );
+
+        self.send(to, "Your VESPER P4 sign-in link", &plain_text, &html)
+            .await
     }
 }

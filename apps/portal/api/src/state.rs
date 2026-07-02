@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use crate::auth::oidc::OidcConfig;
+use crate::auth::session::CookieConfig;
 use crate::db::SharedPool;
 use crate::email::EmailSender;
 
@@ -19,4 +21,15 @@ pub struct AppState {
     /// served from a different origin (Static Web App) than this API, so only
     /// these origins may invoke it from a browser.
     pub cors_allowed_origins: Vec<String>,
+    /// Lifetime of a sign-in session (and its cookie), in days.
+    pub session_ttl_days: i64,
+    /// Lifetime of a magic sign-in link, in minutes. Short: it grants access,
+    /// unlike the verification link which merely proves an address.
+    pub login_link_ttl_minutes: i64,
+    /// Session-cookie scoping (Domain/Secure).
+    pub cookie: CookieConfig,
+    /// Microsoft OIDC sign-in, when configured. `None` makes the
+    /// `/auth/oidc/*` endpoints return `503`; the magic-link flow is
+    /// unaffected.
+    pub oidc: Option<Arc<OidcConfig>>,
 }

@@ -11,6 +11,7 @@ use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::limit::RequestBodyLimitLayer;
 use tower_http::timeout::TimeoutLayer;
 
+use crate::auth;
 use crate::members;
 use crate::state::AppState;
 
@@ -43,7 +44,12 @@ pub fn build_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_origin(AllowOrigin::list(origins))
         .allow_methods([Method::GET, Method::POST])
-        .allow_headers([header::CONTENT_TYPE]);
+        .allow_headers([header::CONTENT_TYPE])
+        // The session cookie must ride along on the portal's fetch() calls
+        // (`credentials: "include"`), which browsers only honor when this
+        // header is present. Legal to combine with the origin list above
+        // because it is an explicit allowlist — never `*`.
+        .allow_credentials(true);
 
     Router::new()
         .route("/health", get(health))
@@ -56,11 +62,25 @@ pub fn build_router(state: AppState) -> Router {
             "/api/v1/members/resend",
             post(members::handlers::resend_verification),
         )
+        .route("/api/v1/auth/oidc/start", get(auth::handlers::oidc_start))
+        .route(
+            "/api/v1/auth/oidc/callback",
+            get(auth::handlers::oidc_callback),
+        )
+        .route(
+            "/api/v1/auth/magic-link",
+            post(auth::handlers::request_magic_link),
+        )
+        .route(
+            "/api/v1/auth/magic-link/consume",
+            post(auth::handlers::consume_magic_link),
+        )
+        .route("/api/v1/auth/signout", post(auth::handlers::signout))
         // Layers are applied outermost-last: CORS wraps everything so even
         // rejected/timed-out responses carry the right headers.
-        // TODO(dev-team): add per-IP rate limiting on /members + /resend (an
-        // email-abuse vector) — e.g. tower_governor — once a real mail provider
-        // is wired and we can pick sensible limits.
+        // TODO(dev-team): add per-IP rate limiting on /members + /resend +
+        // /auth/magic-link (email-abuse vectors) — e.g. tower_governor — once a
+        // real mail provider is wired and we can pick sensible limits.
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
             REQUEST_TIMEOUT,

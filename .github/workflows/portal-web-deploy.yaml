@@ -57,6 +57,11 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
           TURBO_CACHE_DIR: .turbo
+          # NEXT_PUBLIC_* is baked in at build time — without this the bundle
+          # falls back to same-origin ("") and every API call 404s against the
+          # static site. Custom domain (not the raw Container Apps FQDN) so the
+          # vp4_session cookie is same-site with portal.vesperp4.com.
+          NEXT_PUBLIC_API_URL: https://api.portal.vesperp4.com
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
