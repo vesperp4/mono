@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/vesperp4/mono/compare/tv-web-v0.2.0...tv-web-v0.3.0) (2026-07-02)
+
+
+### Features
+
+* **tv:** default to the real Sanity project id ([#160](https://github.com/vesperp4/mono/issues/160)) ([7560f65](https://github.com/vesperp4/mono/commit/7560f65e3bb2898d6d8812a6174ee1a4a54b57c7))
+
 ## [0.2.0](https://github.com/vesperp4/mono/compare/tv-web-v0.1.0...tv-web-v0.2.0) (2026-07-02)
 
 
