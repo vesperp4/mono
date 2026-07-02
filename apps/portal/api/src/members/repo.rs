@@ -1,10 +1,10 @@
 use chrono::{Duration, Utc};
-use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::members::model::MemberRow;
 use crate::members::validate::ValidatedMember;
+use crate::token::{generate_token, hash_token};
 
 /// Outcome of a join submission, telling the handler whether to send mail.
 pub enum SubmitOutcome {
@@ -132,19 +132,4 @@ pub async fn confirm_token(db: &PgPool, raw_token: &str) -> Result<bool, sqlx::E
 
     tx.commit().await?;
     Ok(true)
-}
-
-/// A 256-bit random token, hex-encoded (64 URL-safe chars).
-fn generate_token() -> String {
-    use rand::RngCore;
-    let mut bytes = [0u8; 32];
-    rand::thread_rng().fill_bytes(&mut bytes);
-    hex::encode(bytes)
-}
-
-/// SHA-256 of the raw token — what we store and look up by.
-fn hash_token(token: &str) -> [u8; 32] {
-    let mut hasher = Sha256::new();
-    hasher.update(token.as_bytes());
-    hasher.finalize().into()
 }
