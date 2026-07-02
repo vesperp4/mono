@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/vesperp4/mono/compare/portal-api-v0.6.0...portal-api-v0.7.0) (2026-07-02)
+
+
+### Features
+
+* **portal:** sign-in — Microsoft OIDC (PUPR tenant) + magic link + sessions ([#171](https://github.com/vesperp4/mono/issues/171)) ([#177](https://github.com/vesperp4/mono/issues/177)) ([a9ab22f](https://github.com/vesperp4/mono/commit/a9ab22f986b1c53709ad4dd159a703f1e8504655))
+
 ## [0.6.0](https://github.com/vesperp4/mono/compare/portal-api-v0.5.0...portal-api-v0.6.0) (2026-06-17)
 
 
