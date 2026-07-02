@@ -1,11 +1,12 @@
 # CI/CD Pipeline
 
-Reference for the Vesper P4 CI/CD pipeline. **Trunk-based on `main`.** The Next.js
-**web** app deploys to Azure Static Web Apps; the Rust **api** is containerized, pushed to
-Azure Container Registry (ACR), and deployed to **Azure Container Apps**. Both the Static
-Web App and the Container App are provisioned in a separate **infra repo** (see
-[`infra-repo-spec.md`](./infra-repo-spec.md)); the monorepo builds artifacts and ships them
-(web content via the SWA deploy token, the api image via ACR).
+Reference for the Vesper P4 CI/CD pipeline. **Trunk-based on `main`.** The Next.js web
+apps (**mainsite-web**, **portal-web**) deploy to Azure Static Web Apps; the Rust
+**portal-api** is containerized, pushed to Azure Container Registry (ACR), and deployed to
+**Azure Container Apps**. The Static Web Apps and the Container App are provisioned in a
+separate **infra repo** (see [`infra-repo-spec.md`](./infra-repo-spec.md)); the monorepo
+builds artifacts and ships them (web content via the SWA deploy tokens, the api image via
+ACR).
 
 > Status: the pipeline is scaffolded and ready. A few one-time **bootstrap steps** (below)
 > must be done by the dev team before all checks go green.
@@ -20,7 +21,7 @@ feat/* | fix/* | ci/* | chore/*
     ▼  PR
   main ──► CI gates (web test, api test, security, dependency review)
     │
-    ├──► mainsite-web-deploy.yaml: web → Azure Static Web Apps (production)
+    ├──► mainsite-web-deploy.yaml / portal-web-deploy.yaml: web apps → Azure SWA (production)
     │
     └──► release-please PR ──(merge)──► tag portal-api-vX.Y.Z
                                             │
@@ -45,7 +46,8 @@ feat/* | fix/* | ci/* | chore/*
 | File | Trigger | Purpose |
 |------|---------|---------|
 | `ci.yml` | PR, push `main` | Repo-wide: commit-msg, `pnpm audit`, format-check, lint/typecheck/build |
-| `mainsite-web-test.yaml` | PR, push `main` | Path-filtered web tests (Vitest) + `web-required` gate |
+| `mainsite-web-test.yaml` | PR, push `main` | Path-filtered mainsite-web tests (Vitest) + `web-required` gate |
+| `portal-web-test.yaml` | PR, push `main` | Path-filtered portal-web tests (Vitest) + `web-required` gate |
 | `portal-api-test.yaml` | PR, push `main` | Path-filtered API gate → calls `_rust-service-test.yaml`; `api-required` gate |
 | `_rust-service-test.yaml` | `workflow_call` | fmt, clippy, cargo-deny (bans/licenses/sources), tests + coverage against Postgres, Trivy image scan |
 | `portal-api-security.yaml` | daily, push `main` (dep paths), dispatch | RustSec advisories (cargo-deny) + Trivy scan → Security tab; opens a tracking issue on new advisories |
@@ -56,17 +58,20 @@ feat/* | fix/* | ci/* | chore/*
 | `secret-scan.yaml` | PR | Secret scanning (TruffleHog — free for orgs) |
 | `dependency-review.yaml` | PR | Block PRs introducing high-severity dependency CVEs |
 | `scorecard.yml` | weekly, push `main` | OpenSSF Scorecard |
-| `mainsite-web-deploy.yaml` | push `main` (web paths), dispatch | Build + upload web content to Azure SWA (production) |
+| `mainsite-web-deploy.yaml` | push `main` (mainsite-web paths), dispatch | Build + upload mainsite-web content to Azure SWA (production) |
+| `portal-web-deploy.yaml` | push `main` (portal-web paths), dispatch | Build + upload portal-web content to Azure SWA (production) |
+| `codeql.yml` | PR, push `main`, weekly | CodeQL static analysis → Security tab |
 | `pr-title.yml` | PR | Semantic PR title check |
 
-Reusable workflows are prefixed `_`. Project-specific workflows are named
-`mainsite-<service>-<purpose>.yaml`.
+Reusable workflows are prefixed `_`. App-specific workflows are named
+`<project>-<service>-<purpose>.yaml` (e.g. `mainsite-web-test.yaml`, `portal-api-build.yaml`).
 
 ### Required status checks (set in branch protection)
 
 The `*-required` jobs always report (even when their path filter doesn't match), so they are
-safe to mark **required**: `Mainsite API Test / api-required`, `Mainsite Web Test / web-required`,
-`Dependency Review / review`, `Secret Scan / scan`, plus `CI / Typecheck & Build`.
+safe to mark **required**: `Portal API Test / api-required`, `Mainsite Web Test / web-required`,
+`Portal Web Test / web-required`, `Dependency Review / review`, `Secret Scan / scan`, plus
+`CI / Typecheck & Build`.
 
 > Branch protection's "require status checks" is currently **disabled** while the pipeline
 > stabilizes. Re-enable it with the checks above once the bootstrap steps are done.
@@ -77,7 +82,7 @@ safe to mark **required**: `Mainsite API Test / api-required`, `Mainsite Web Tes
 
 | Name | Type | Used by | Purpose |
 |------|------|---------|---------|
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | `mainsite-web-deploy.yaml` | Web content upload to Azure SWA (token from the infra-provisioned SWA) |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | `*-web-deploy.yaml` | Web content upload to Azure SWA (per-app token from the infra-provisioned SWA, scoped via GitHub environments) |
 | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` | secret | `portal-api-build.yaml` | Azure OIDC login to push to ACR |
 | `ACR_NAME` / `ACR_LOGIN_SERVER` | variable | `portal-api-build.yaml` | Target registry (e.g. `vesperp4acr` / `vesperp4acr.azurecr.io`) |
 | `INFRA_APP_ID` / `INFRA_APP_KEY` | secret | `_update-infra.yaml`, promote | GitHub App that can open PRs in the infra repo |

@@ -1,26 +1,36 @@
 # Vesper P4 — Website
 
 [![CI](https://github.com/vesperp4/mono/actions/workflows/ci.yml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/ci.yml)
-[![Deploy](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml)
+[![Mainsite Deploy](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/mainsite-web-deploy.yaml)
+[![Portal Deploy](https://github.com/vesperp4/mono/actions/workflows/portal-web-deploy.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/portal-web-deploy.yaml)
+[![Portal API Build](https://github.com/vesperp4/mono/actions/workflows/portal-api-build.yaml/badge.svg)](https://github.com/vesperp4/mono/actions/workflows/portal-api-build.yaml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/vesperp4/mono/badge)](https://scorecard.dev/viewer/?uri=github.com/vesperp4/mono)
 
-Official website for the Vesper P4 graduate CS/engineering chapter at Polytechnic University of Puerto Rico.
+Official website and member portal for the Vesper P4 graduate CS/engineering chapter at
+Polytechnic University of Puerto Rico.
 
-**Production** → [vesperp4.com](https://vesperp4.com)
+| App               | Production                                       | Dev                                                        |
+| ----------------- | ------------------------------------------------ | ---------------------------------------------------------- |
+| **Main site**     | [vesperp4.com](https://vesperp4.com)             | [dev.vesperp4.com](https://dev.vesperp4.com)               |
+| **Member portal** | [portal.vesperp4.com](https://portal.vesperp4.com) | [portal.dev.vesperp4.com](https://portal.dev.vesperp4.com) |
 
 ---
 
 ## Stack
 
-| Layer          | Technology                         |
-| -------------- | ---------------------------------- |
-| Framework      | Next.js 16+ (App Router)           |
-| Language       | TypeScript (strict)                |
-| Styling        | Tailwind CSS v4 + shadcn/ui        |
-| CMS            | Sanity v3                          |
-| Hosting        | Azure Static Web Apps              |
-| Auth (Phase 3) | Microsoft Entra ID (via Azure SWA) |
-| CI/CD          | GitHub Actions                     |
+| Layer            | Technology                                     |
+| ---------------- | ---------------------------------------------- |
+| Frontend         | Next.js 16+ (App Router), TypeScript (strict)  |
+| Styling          | Tailwind CSS v4 + shadcn/ui                    |
+| CMS (Phase 2)    | Sanity v3                                      |
+| Backend (portal) | Rust — Axum + sqlx                             |
+| Database         | Azure Database for PostgreSQL Flexible Server  |
+| Email            | Azure Communication Services                   |
+| Web hosting      | Azure Static Web Apps                          |
+| API hosting      | Azure Container Apps (images in ACR)           |
+| Auth (planned)   | Microsoft OIDC SSO + magic-link fallback       |
+| CI/CD            | GitHub Actions                                 |
+| IaC              | Azure Bicep — separate infra repo              |
 
 ---
 
@@ -46,6 +56,8 @@ mise run dev        # start the dev server
 
 → App: [http://localhost:3000](http://localhost:3000)
 
+Working on the portal API? `mise run db-up` starts a local Postgres for it.
+
 Run `mise tasks` to see everything available; `mise run check` runs all the CI gates locally.
 
 ---
@@ -54,20 +66,25 @@ Run `mise tasks` to see everything available; `mise run check` runs all the CI g
 
 ```
 apps/
-  mainsite/         Main site (web frontend + api)
-    web/            Web frontend (Next.js) → Azure Static Web Apps
-      src/
-        app/        App Router pages and layouts
-        components/ UI components (ui/, layout/, sections/, common/)
-        lib/        Sanity client, GROQ queries, utilities
-        types/      Shared TypeScript types + generated Sanity types
-    api/            Rust (Axum + sqlx) backend → Azure Container Apps
+  mainsite/web/     Public site (Next.js) → vesperp4.com
+    app/            App Router pages and layouts
+    components/     UI components
+    lib/            Utilities (Sanity client lands here in Phase 2)
+  portal/web/       Member portal (Next.js) → portal.vesperp4.com
+    app/            Routes: /, /signup, /signin, /confirm
+    components/     UI components (join form, …)
+  portal/api/       Members API (Rust: Axum + sqlx) → Azure Container Apps
+    src/            Service code (router, members domain, email, db)
+    migrations/     sqlx migrations
 packages/
   tsconfig/         Shared TypeScript configs (base, nextjs, node)
   eslint-config/    Shared ESLint config
 .github/
-  workflows/        CI/CD — lint, typecheck, build, deploy
+  workflows/        CI/CD — per-app test/deploy/build, release, prod promote
 ```
+
+The main site is content-only and makes no API calls. Everything membership-related
+(signup, sign-in, email confirmation) lives on the portal, backed by `portal-api`.
 
 Full reference → [docs/project-structure.md](./docs/project-structure.md)
 
@@ -82,6 +99,9 @@ feat/* or fix/*  →  PR to main  →  production
 - Trunk-based: branch off `main`, open a PR back to `main`
 - CI must pass (lint, typecheck, build) before merge
 - 1 approval required on all PRs
+- Web apps deploy straight from `main`; `portal-api` releases via release-please —
+  merging its release PR builds and signs the container image, deploys to dev
+  automatically, and prod promotion is approval-gated
 
 Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
 
@@ -89,21 +109,19 @@ Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
 
 ## Content Management
 
-Team roster, projects, and other dynamic content are managed through Sanity Studio (Phase 2+).
-
-- **Deployed Studio** → [chapter-studio.sanity.io](https://chapter-studio.sanity.io)
-- Content editors do not need to touch the codebase
-- Schema changes require a PR and a `pnpm sanity typegen generate` run
+Editorial content (blog, events, team roster) moves to **Sanity Studio** in Phase 2 —
+content editors won't need to touch the codebase. Member data is not content: it lives
+in PostgreSQL, owned by `portal-api`.
 
 ---
 
 ## Roadmap
 
-| Phase | Scope                                                     | Status         |
-| ----- | --------------------------------------------------------- | -------------- |
-| **1** | Public showcase — landing, about, team, projects, contact | 🚧 In progress |
-| **2** | Events listing + blog                                     | 📋 Planned     |
-| **3** | Member portal with Entra ID auth                          | 📋 Planned     |
+| Phase | Scope                                                          | Status         |
+| ----- | -------------------------------------------------------------- | -------------- |
+| **1** | Public showcase — landing, about, team, projects, contact      | 🚧 In progress |
+| **2** | Events listing + blog (Sanity CMS)                             | 📋 Planned     |
+| **3** | Member portal — email-verified signup live; SSO sign-in next   | 🚧 In progress |
 
 ---
 
