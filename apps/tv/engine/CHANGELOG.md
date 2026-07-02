@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.1...tv-engine-v0.2.2) (2026-07-02)
+
+
+### Bug Fixes
+
+* **tv:** align engine channel profile with actual packager output ([#158](https://github.com/vesperp4/mono/issues/158)) ([302abfd](https://github.com/vesperp4/mono/commit/302abfd7dda9f3e29bc10bd3016eeb302100dd0c))
+
 ## [0.2.1](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.0...tv-engine-v0.2.1) (2026-07-02)
 
 
