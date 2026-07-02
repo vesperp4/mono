@@ -21,10 +21,13 @@ anyhow = "1"
 arc-swap = "1.9.1"
 async-trait = "0.1"
 axum = "0.8"
+axum-extra = { version = "0.10", features = ["cookie"] }
 azure_core = "1.0.0"
 azure_identity = "1.0.0"
+base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 hex = "0.4"
+jsonwebtoken = "9"
 rand = "0.8"
 # default-features off to drop the OpenSSL-backed default TLS; rustls matches the
 # distroless runtime (no system OpenSSL) and the ring backend sqlx already uses.
@@ -41,10 +44,13 @@ sqlx = { version = "0.9", default-features = false, features = [
     "uuid",
     "chrono",
 ] }
-tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal"] }
+# The `cookie` crate under axum-extra speaks `time` (not `chrono`) for Max-Age.
+time = "0.3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "sync"] }
 tower-http = { version = "0.6", features = ["cors", "limit", "timeout"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url = "2"
 uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
