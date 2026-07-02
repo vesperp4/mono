@@ -4,5 +4,5 @@
   "apps/portal/web": "0.2.0",
   "apps/tv/web": "0.2.0",
   "apps/tv/engine": "0.2.0",
-  "apps/tv/packager": "0.1.0"
+  "apps/tv/packager": "0.2.0"
 }
