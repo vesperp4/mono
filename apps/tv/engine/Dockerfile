@@ -10,8 +10,10 @@ COPY packages ./packages
 COPY apps/tv/engine ./apps/tv/engine
 RUN pnpm install --frozen-lockfile --filter tv-engine...
 RUN pnpm --filter tv-engine build
-# Standalone deployable bundle (prod deps + dist only)
-RUN pnpm --filter tv-engine --prod deploy /out
+# Standalone deployable bundle (prod deps + dist only). --legacy: pnpm v10
+# requires inject-workspace-packages otherwise; tv-engine has no runtime
+# workspace deps, so legacy copy-deploy is correct.
+RUN pnpm --filter tv-engine --prod deploy --legacy /out
 
 FROM node:20-alpine AS runtime
 ENV NODE_ENV=production
