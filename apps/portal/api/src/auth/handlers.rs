@@ -144,12 +144,19 @@ pub async fn request_magic_link(
     if let Some((_member_id, token)) =
         magic::request_login_token(&state.db.load(), &email, state.login_link_ttl_minutes).await?
     {
+        // Fire-and-forget: never await (or reflect) the send, so a real member's
+        // address and an unknown one produce an identical 202 with identical
+        // timing — an ACS failure must not become a 500 that reveals the address
+        // is registered. Failures are logged. See members::handlers for the same
+        // pattern on the verification path.
+        let email_sender = state.email.clone();
+        let to = email.clone();
         let link = format!("{}/auth?token={}", state.public_base_url, token);
-        state
-            .email
-            .send_login_link(&email, &link)
-            .await
-            .map_err(AppError::Internal)?;
+        tokio::spawn(async move {
+            if let Err(err) = email_sender.send_login_link(&to, &link).await {
+                tracing::error!(target: "email", error = %err, "sign-in link email send failed");
+            }
+        });
     }
 
     Ok((StatusCode::ACCEPTED, Json(StatusResponse::new("link_sent"))))

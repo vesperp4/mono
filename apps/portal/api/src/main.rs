@@ -104,8 +104,25 @@ async fn main() -> anyhow::Result<()> {
             Arc::new(AcsEmailSender::new(endpoint, sender)?)
         }
         _ => {
-            tracing::info!(
-                "ACS not configured — using LogEmailSender (links are logged, not emailed)"
+            // Fail closed: the log-only sender writes raw sign-in links (which
+            // contain single-use tokens) to the logs — fine for local/CI, but in
+            // a deployed environment it would stream replayable credentials into
+            // Log Analytics. Require an explicit opt-in so a dropped ACS_* var in
+            // Azure refuses to boot instead of silently falling back.
+            let allow_log_sender = std::env::var("ALLOW_LOG_EMAIL_SENDER")
+                .ok()
+                .and_then(|v| v.parse::<bool>().ok())
+                .unwrap_or(false);
+            if !allow_log_sender {
+                anyhow::bail!(
+                    "email is not configured: set ACS_ENDPOINT and ACS_SENDER_ADDRESS, or set \
+                     ALLOW_LOG_EMAIL_SENDER=true for local/CI. Refusing to start with the \
+                     log-only email sender in a deployed environment — it logs raw sign-in tokens."
+                );
+            }
+            tracing::warn!(
+                "ACS not configured — using LogEmailSender (sign-in links are LOGGED, not \
+                 emailed). Local/CI only; never use in a deployed environment."
             );
             Arc::new(LogEmailSender)
         }
@@ -185,6 +202,28 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn shutdown_signal() {
-    let _ = tokio::signal::ctrl_c().await;
-    tracing::info!("shutdown signal received");
+    // Azure Container Apps (and container runtimes generally) send SIGTERM on
+    // stop/scale-down; Rust's default disposition kills the process immediately,
+    // so without an explicit handler `with_graceful_shutdown` never runs and
+    // in-flight requests are cut. Handle SIGTERM alongside SIGINT (Ctrl-C).
+    #[cfg(unix)]
+    {
+        use tokio::signal::unix::{signal, SignalKind};
+        let mut sigterm = match signal(SignalKind::terminate()) {
+            Ok(s) => s,
+            Err(err) => {
+                tracing::error!(error = %err, "failed to install SIGTERM handler");
+                return;
+            }
+        };
+        tokio::select! {
+            _ = tokio::signal::ctrl_c() => tracing::info!("SIGINT received, shutting down"),
+            _ = sigterm.recv() => tracing::info!("SIGTERM received, shutting down"),
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = tokio::signal::ctrl_c().await;
+        tracing::info!("shutdown signal received");
+    }
 }
