@@ -3,25 +3,27 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MEDIA } from "@/lib/media";
 import { motion } from "framer-motion";
 
-// Root-relative hrefs so every link works from subpages (/blog, /events) as
-// well as the home page — "/#about" navigates home first, then scrolls to the
-// anchor (html has scroll-smooth, so in-page jumps stay animated).
+// Page-based navigation — the home page keeps its scroll sections (#pillars,
+// #stars, #mission, #leadership), but the navbar links to the dedicated
+// sub-pages so it works identically from every route.
 const links = [
-  { label: "About", href: "/#about" },
-  { label: "Pillars", href: "/#pillars" },
-  { label: "Stars", href: "/#stars" },
-  { label: "Mission", href: "/#mission" },
-  { label: "Leadership", href: "/#leadership" },
-  { label: "Blog", href: "/blog" },
+  { label: "About", href: "/about" },
+  { label: "Team", href: "/team" },
+  { label: "Projects", href: "/projects" },
   { label: "Events", href: "/events" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -63,14 +65,19 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop nav — lg breakpoint (7 links no longer fit at md) */}
+        {/* Desktop nav — lg breakpoint (6 links don't fit at md) */}
         <nav className="hidden lg:flex items-center gap-6">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
               className={`text-xs font-medium tracking-widest uppercase transition-all duration-300 hover:opacity-60 ${
                 scrolled ? "text-zinc-900" : "text-white"
+              } ${
+                isActive(link.href)
+                  ? "underline decoration-1 underline-offset-8 decoration-current/40"
+                  : ""
               }`}
             >
               {link.label}
@@ -109,7 +116,12 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="text-sm font-medium tracking-widest uppercase text-zinc-900 text-left hover:opacity-60 transition-opacity"
+              aria-current={isActive(link.href) ? "page" : undefined}
+              className={`text-sm font-medium tracking-widest uppercase text-zinc-900 text-left hover:opacity-60 transition-opacity ${
+                isActive(link.href)
+                  ? "underline decoration-1 underline-offset-8 decoration-zinc-400"
+                  : ""
+              }`}
             >
               {link.label}
             </Link>
