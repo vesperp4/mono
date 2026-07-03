@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const TEXT = "VESPER P4";
 const LETTERS = TEXT.split("");
@@ -21,19 +22,19 @@ function distanceToStretch(distance: number): number {
 // Signup lives on the portal app (portal.vesperp4.com), not the mainsite.
 const PORTAL_SIGNUP_URL = "https://portal.vesperp4.com/signup";
 
+// Root-relative anchors so the footer works from subpages (/blog, /events)
+// as well as the home page.
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
-  { label: "About", href: "#about" },
-  { label: "Pillars", href: "#pillars" },
-  { label: "Founders", href: "#stars" },
-  { label: "Mission", href: "#mission" },
+  { label: "About", href: "/#about" },
+  { label: "Pillars", href: "/#pillars" },
+  { label: "Founders", href: "/#stars" },
+  { label: "Mission", href: "/#mission" },
+  { label: "Blog", href: "/blog" },
+  { label: "Events", href: "/events" },
   { label: "Join", href: PORTAL_SIGNUP_URL, external: true },
 ];
 
 const PILLAR_COLORS = ["#dc2626", "#2563eb", "#16a34a", "#7c3aed"];
-
-function scrollTo(href: string) {
-  document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-}
 
 export default function Footer() {
   const [weights, setWeights] = useState<number[]>(LETTERS.map(() => 400));
@@ -130,13 +131,13 @@ export default function Footer() {
                       {link.label}
                     </a>
                   ) : (
-                    <button
+                    <Link
                       key={link.href}
-                      onClick={() => scrollTo(link.href)}
+                      href={link.href}
                       className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 text-left w-fit"
                     >
                       {link.label}
-                    </button>
+                    </Link>
                   )
                 )}
               </nav>

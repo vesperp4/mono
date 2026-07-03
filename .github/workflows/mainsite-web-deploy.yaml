@@ -10,6 +10,11 @@ on:
       - 'apps/mainsite/web/**'
       - '.github/workflows/mainsite-web-deploy.yaml'
   workflow_dispatch:
+  # Content-triggered rebuild: a Sanity GROQ-powered webhook (on publish of
+  # post/event documents) POSTs to the GitHub repository dispatches API using a
+  # fine-grained PAT, so publishing content redeploys the static site.
+  repository_dispatch:
+    types: [sanity-publish]
 
 concurrency:
   group: mainsite-web-deploy-${{ github.ref }}
