@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.3.0...mainsite-web-v0.4.0) (2026-07-03)
+
+
+### Features
+
+* **mainsite:** about, team, projects, contact sub-pages ([#197](https://github.com/vesperp4/mono/issues/197)) ([da4a4cc](https://github.com/vesperp4/mono/commit/da4a4cc9cac6e60da5703f2a955d73a4afa68e3f))
+
 ## [0.3.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.2.0...mainsite-web-v0.3.0) (2026-07-03)
 
 
