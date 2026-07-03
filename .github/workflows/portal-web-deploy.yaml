@@ -1,8 +1,9 @@
 name: portal-web Deploy
 
 # Builds the Next.js portal frontend and uploads it to the infra-managed Azure
-# Static Web App (portal-web-prod) using its deployment token. The SWA resource
-# itself is provisioned in the infra repo (bicep/web.bicep), not here.
+# Static Web Apps (portal-web-dev + portal-web-prod) using their deployment
+# tokens. The SWA resources themselves are provisioned in the infra repo
+# (bicep/web.bicep), not here.
 on:
   push:
     branches: [main]
@@ -20,13 +21,27 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to Azure Static Web Apps
+    name: Deploy ${{ matrix.env }}
     runs-on: ubuntu-latest
 
-    # Scoped to the azure-swa-portal environment, which holds this SWA's
-    # AZURE_STATIC_WEB_APPS_API_TOKEN (mirrors azure-swa for mainsite-web). No
-    # reviewer gate — trunk-based auto-deploy.
-    environment: azure-swa-portal
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Each leg builds its own bundle because NEXT_PUBLIC_API_URL is baked
+          # in at build time — the dev site must talk to the dev API so the
+          # vp4_session cookie stays same-site with portal.dev.vesperp4.com.
+          - env: dev
+            gh_environment: azure-swa-portal-dev
+            api_url: https://api.portal.dev.vesperp4.com
+          - env: prod
+            gh_environment: azure-swa-portal
+            api_url: https://api.portal.vesperp4.com
+
+    # Each GitHub environment holds its SWA's AZURE_STATIC_WEB_APPS_API_TOKEN
+    # (mirrors azure-swa for mainsite-web). No reviewer gate — trunk-based
+    # auto-deploy to both stages on every main push.
+    environment: ${{ matrix.gh_environment }}
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -46,8 +61,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo
-          key: turbo-${{ runner.os }}-${{ github.sha }}
-          restore-keys: turbo-${{ runner.os }}-
+          key: turbo-${{ runner.os }}-${{ matrix.env }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-${{ matrix.env }}-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -60,8 +75,8 @@ jobs:
           # NEXT_PUBLIC_* is baked in at build time — without this the bundle
           # falls back to same-origin ("") and every API call 404s against the
           # static site. Custom domain (not the raw Container Apps FQDN) so the
-          # vp4_session cookie is same-site with portal.vesperp4.com.
-          NEXT_PUBLIC_API_URL: https://api.portal.vesperp4.com
+          # vp4_session cookie is same-site with the portal web origin.
+          NEXT_PUBLIC_API_URL: ${{ matrix.api_url }}
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
