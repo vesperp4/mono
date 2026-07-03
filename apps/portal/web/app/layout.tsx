@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Anybody } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import SiteHeader from "@/components/SiteHeader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${anybody.variable} h-full scroll-smooth`}>
       <body className="min-h-full antialiased font-[family-name:var(--font-inter)]">
-        <Providers>{children}</Providers>
+        <Providers>
+          <SiteHeader />
+          {children}
+        </Providers>
       </body>
     </html>
   );

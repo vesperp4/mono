@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { FormField, FormSelectField } from "@/components/FormFields";
+import { DEPARTMENTS } from "@/lib/departments";
 
 interface FormData {
   firstName: string;
@@ -156,6 +158,8 @@ export default function JoinForm() {
                 name="department"
                 value={form.department}
                 onChange={handleChange}
+                options={DEPARTMENTS}
+                placeholder="Select department"
                 required
               />
 
@@ -177,70 +181,5 @@ export default function JoinForm() {
         </motion.div>
       </div>
     </section>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  name: string;
-  type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  placeholder?: string;
-  position?: "left" | "right";
-}
-
-function FormField({ label, name, type, value, onChange, required, placeholder, position }: FieldProps) {
-  return (
-    <div className={`border border-zinc-800 bg-zinc-950 p-5 focus-within:border-zinc-600 transition-colors duration-300 ${position === "right" ? "border-l-0" : ""}`}>
-      <label className="block text-[10px] font-semibold tracking-widest uppercase text-zinc-500 mb-2">
-        {label}
-      </label>
-      <input
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder={placeholder}
-        className="w-full bg-transparent text-sm text-white placeholder-zinc-700 outline-none"
-      />
-    </div>
-  );
-}
-
-interface SelectProps {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  required?: boolean;
-}
-
-function FormSelectField({ label, name, value, onChange, required }: SelectProps) {
-  return (
-    <div className="border border-zinc-800 border-t-0 bg-zinc-950 p-5 focus-within:border-zinc-600 transition-colors duration-300">
-      <label className="block text-[10px] font-semibold tracking-widest uppercase text-zinc-500 mb-2">
-        {label}
-      </label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="w-full bg-transparent text-sm text-white outline-none appearance-none cursor-pointer"
-      >
-        <option value="" disabled className="bg-zinc-900">Select department</option>
-        <option value="matematicas" className="bg-zinc-900">Departamento de Matemáticas y Ciencias</option>
-        <option value="arquitectura" className="bg-zinc-900">Escuela de Arquitectura</option>
-        <option value="gerencia" className="bg-zinc-900">Escuela de Gerencia y Emprendimiento</option>
-        <option value="biomedica" className="bg-zinc-900">Departamento de Ingeniería Biomédica</option>
-        <option value="civil" className="bg-zinc-900">Departamento de Ingeniería Civil, Ambiental y Agrimensura</option>
-        <option value="industrial" className="bg-zinc-900">Departamento de Ingeniería Industrial</option>
-        <option value="electrica" className="bg-zinc-900">Departamento de Ingeniería Eléctrica, de Computadoras y Ciencias de la Computación</option>
-        <option value="mecanica" className="bg-zinc-900">Departamento de Ingeniería Mecánica</option>
-      </select>
-    </div>
   );
 }

@@ -1,11 +1,13 @@
 "use client";
 
-// Client-side providers wrapper. Empty for now — session/auth context will be
-// added here when portal authentication (Microsoft OIDC SSO + magic-link) lands.
+import { SessionProvider } from "@/lib/session";
+
+// Client-side providers wrapper. SessionProvider fetches /members/me once and
+// shares the result app-wide (navbar auth states, /dashboard, /profile).
 export default function Providers({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <SessionProvider>{children}</SessionProvider>;
 }
