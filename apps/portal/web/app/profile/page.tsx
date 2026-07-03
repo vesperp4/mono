@@ -1,12 +1,17 @@
 "use client";
 
 import ProfileForm from "@/components/ProfileForm";
+import SessionError from "@/components/SessionError";
 import { useRequireSession } from "@/lib/session";
 
 // Member profile — view + self-service edit backed by GET/PATCH /members/me.
 // Session-gated client-side like /dashboard (see lib/session.tsx).
 export default function ProfilePage() {
-  const { member, loading, refresh } = useRequireSession();
+  const { member, loading, error, refresh } = useRequireSession();
+
+  if (error && !member) {
+    return <SessionError onRetry={refresh} />;
+  }
 
   if (loading || !member) {
     return (
