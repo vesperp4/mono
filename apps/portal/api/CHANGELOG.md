@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/vesperp4/mono/compare/portal-api-v0.8.0...portal-api-v0.8.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **portal-api:** add process-only /livez endpoint for liveness ([#193](https://github.com/vesperp4/mono/issues/193)) ([bbce7bd](https://github.com/vesperp4/mono/commit/bbce7bd2ef12fbb9b5d404d363656f0bfdf7c35f))
+* **portal-api:** key rate limiter on the trusted X-Forwarded-For hop ([#192](https://github.com/vesperp4/mono/issues/192)) ([93ff47b](https://github.com/vesperp4/mono/commit/93ff47b48ba8c14955a33701e0341634b4bd18c6))
+
 ## [0.8.0](https://github.com/vesperp4/mono/compare/portal-api-v0.7.0...portal-api-v0.8.0) (2026-07-03)
 
 
