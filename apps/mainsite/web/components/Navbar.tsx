@@ -2,15 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { MEDIA } from "@/lib/media";
 import { motion } from "framer-motion";
 
+// Root-relative hrefs so every link works from subpages (/blog, /events) as
+// well as the home page — "/#about" navigates home first, then scrolls to the
+// anchor (html has scroll-smooth, so in-page jumps stay animated).
 const links = [
-  { label: "About", href: "#about" },
-  { label: "Pillars", href: "#pillars" },
-  { label: "Stars", href: "#stars" },
-  { label: "Mission", href: "#mission" },
-  { label: "Leadership", href: "#leadership" },
+  { label: "About", href: "/#about" },
+  { label: "Pillars", href: "/#pillars" },
+  { label: "Stars", href: "/#stars" },
+  { label: "Mission", href: "/#mission" },
+  { label: "Leadership", href: "/#leadership" },
+  { label: "Blog", href: "/blog" },
+  { label: "Events", href: "/events" },
 ];
 
 export default function Navbar() {
@@ -22,12 +28,6 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const scrollTo = (href: string) => {
-    setMenuOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <motion.header
@@ -41,8 +41,8 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-16 flex items-center justify-between">
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        <Link
+          href="/"
           className="flex items-center gap-3 group"
           aria-label="VESPER P4 Home"
         >
@@ -61,26 +61,26 @@ export default function Navbar() {
           >
             VESPER P4
           </span>
-        </button>
+        </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Desktop nav — lg breakpoint (7 links no longer fit at md) */}
+        <nav className="hidden lg:flex items-center gap-6">
           {links.map((link) => (
-            <button
+            <Link
               key={link.href}
-              onClick={() => scrollTo(link.href)}
+              href={link.href}
               className={`text-xs font-medium tracking-widest uppercase transition-all duration-300 hover:opacity-60 ${
                 scrolled ? "text-zinc-900" : "text-white"
               }`}
             >
               {link.label}
-            </button>
+            </Link>
           ))}
         </nav>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden flex flex-col gap-1.5 p-2"
+          className="lg:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -102,16 +102,17 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="md:hidden bg-white/95 backdrop-blur-md border-b border-zinc-200 px-6 py-4 flex flex-col gap-4"
+          className="lg:hidden bg-white/95 backdrop-blur-md border-b border-zinc-200 px-6 py-4 flex flex-col gap-4"
         >
           {links.map((link) => (
-            <button
+            <Link
               key={link.href}
-              onClick={() => scrollTo(link.href)}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
               className="text-sm font-medium tracking-widest uppercase text-zinc-900 text-left hover:opacity-60 transition-opacity"
             >
               {link.label}
-            </button>
+            </Link>
           ))}
         </motion.div>
       )}

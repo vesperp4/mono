@@ -70,9 +70,10 @@ Run `mise tasks` to see everything available; `mise run check` runs all the CI g
 ```
 apps/
   mainsite/web/     Public site (Next.js) → vesperp4.com
-    app/            App Router pages and layouts
+    app/            App Router pages and layouts (/, /blog, /events)
     components/     UI components
-    lib/            Utilities (Sanity client lands here in Phase 2)
+    lib/            Utilities + Sanity GROQ client (cms.ts)
+  mainsite/studio/  Sanity Studio — mainsite content admin: events + blog (separate Sanity project)
   portal/web/       Member portal (Next.js) → portal.vesperp4.com
     app/            Routes: /, /signup, /signin, /confirm, /auth, /dashboard, /profile
     components/     UI components (join form, profile form, header, …)

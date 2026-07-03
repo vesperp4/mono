@@ -39,11 +39,12 @@ apps/mainsite/web/
 │   ├── layout.tsx          Root layout (html, body, global styles)
 │   ├── globals.css         Tailwind CSS entry point
 │   ├── providers.tsx       Client-side providers
-│   └── page.tsx            Home page (/) — Phase 1 pages (about, team, …)
-│                           land as app/<route>/page.tsx
+│   ├── page.tsx            Home page (/)
+│   ├── blog/               Blog index + posts (Sanity-backed, /blog/[slug])
+│   └── events/             Events listing — upcoming + past (Sanity-backed)
 ├── components/             UI components (hero, sections, cards, navbar, …)
 │   └── ui/                 shadcn/ui-style primitives
-├── lib/                    Utilities (Sanity client + GROQ queries in Phase 2)
+├── lib/                    Utilities + Sanity GROQ client (cms.ts, dates.ts)
 ├── public/                 Static assets
 ├── test/                   Vitest tests
 ├── eslint.config.mjs       ESLint config (extends @repo/eslint-config/next)
@@ -55,6 +56,19 @@ apps/mainsite/web/
 ```
 
 The "Join" calls-to-action link to the portal — this app never talks to `portal-api`.
+
+Editorial content (blog posts + events) comes from the mainsite Sanity project via
+read-only GROQ queries in `lib/cms.ts` — plain `fetch`, no Sanity SDK. The site
+stays fully static: content is fetched at build time and a Sanity publish webhook
+triggers a redeploy (`repository_dispatch: sanity-publish`).
+
+---
+
+## apps/mainsite/studio
+
+Sanity Studio for the mainsite CMS (events + blog) — a **separate Sanity project**
+from the TV one. Deployed to `<name>.sanity.studio` via `sanity deploy`; no Azure
+resources. Schemas: `post`, `event`. See its README for one-time project setup.
 
 ---
 
