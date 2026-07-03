@@ -56,9 +56,11 @@ jobs:
           push: true
           provenance: mode=max
           sbom: true
+          # No `:latest` — it is a mutable floating tag nothing deploys from, and
+          # publishing it only creates an overwrite target. Deploys pin the
+          # immutable version tag; `sha-<commit>` stays for traceability.
           tags: |
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
-            ${{ steps.meta.outputs.image }}:latest
             ${{ steps.meta.outputs.image }}:sha-${{ github.sha }}
           cache-from: type=gha,scope=portal-api
           cache-to: type=gha,mode=max,scope=portal-api
