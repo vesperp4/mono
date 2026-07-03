@@ -8,6 +8,7 @@ pub mod db;
 pub mod email;
 pub mod error;
 pub mod members;
+pub mod rate_limit;
 pub mod router;
 pub mod state;
 pub mod token;

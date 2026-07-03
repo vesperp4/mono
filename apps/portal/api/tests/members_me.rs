@@ -57,6 +57,10 @@ fn app(pool: PgPool) -> Router {
         cors_allowed_origins: vec!["http://localhost:3000".into()],
         session_ttl_days: 30,
         login_link_ttl_minutes: 15,
+        // Generous limit / no cooldown so the email-endpoint limiter can
+        // never interfere with what these tests exercise.
+        rate_limit_per_minute: 1000,
+        email_cooldown_seconds: 0,
         cookie: CookieConfig {
             domain: None,
             secure: false,

@@ -13,6 +13,7 @@ use tower_http::timeout::TimeoutLayer;
 
 use crate::auth;
 use crate::members;
+use crate::rate_limit::{self, RateLimiter};
 use crate::state::AppState;
 
 /// Largest request body we accept. The members payloads are tiny JSON objects;
@@ -51,9 +52,21 @@ pub fn build_router(state: AppState) -> Router {
         // because it is an explicit allowlist — never `*`.
         .allow_credentials(true);
 
+    // Per-client-IP limiter shared by the three public endpoints that send
+    // email (join, resend, magic-link) — the abuse vectors (ACS quota burn,
+    // email-bombing an address). One bucket per IP across the group; other
+    // routes are untouched. In-memory, so per replica — see `rate_limit` docs.
+    let email_rate_limit = axum::middleware::from_fn_with_state(
+        RateLimiter::new(state.rate_limit_per_minute),
+        rate_limit::enforce,
+    );
+
     Router::new()
         .route("/health", get(health))
-        .route("/api/v1/members", post(members::handlers::create_member))
+        .route(
+            "/api/v1/members",
+            post(members::handlers::create_member).layer(email_rate_limit.clone()),
+        )
         .route(
             "/api/v1/members/me",
             get(members::handlers::get_me).patch(members::handlers::update_me),
@@ -64,7 +77,7 @@ pub fn build_router(state: AppState) -> Router {
         )
         .route(
             "/api/v1/members/resend",
-            post(members::handlers::resend_verification),
+            post(members::handlers::resend_verification).layer(email_rate_limit.clone()),
         )
         .route("/api/v1/auth/oidc/start", get(auth::handlers::oidc_start))
         .route(
@@ -73,7 +86,7 @@ pub fn build_router(state: AppState) -> Router {
         )
         .route(
             "/api/v1/auth/magic-link",
-            post(auth::handlers::request_magic_link),
+            post(auth::handlers::request_magic_link).layer(email_rate_limit),
         )
         .route(
             "/api/v1/auth/magic-link/consume",
@@ -82,9 +95,6 @@ pub fn build_router(state: AppState) -> Router {
         .route("/api/v1/auth/signout", post(auth::handlers::signout))
         // Layers are applied outermost-last: CORS wraps everything so even
         // rejected/timed-out responses carry the right headers.
-        // TODO(dev-team): add per-IP rate limiting on /members + /resend +
-        // /auth/magic-link (email-abuse vectors) — e.g. tower_governor — once a
-        // real mail provider is wired and we can pick sensible limits.
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
             REQUEST_TIMEOUT,

@@ -41,6 +41,21 @@ async fn main() -> anyhow::Result<()> {
         .and_then(|v| v.parse::<i64>().ok())
         .unwrap_or(15);
 
+    // Per-client-IP allowance per minute on the public email-sending endpoints
+    // (join, resend, magic-link). They legitimately see at most a few requests
+    // per user per minute, so the default is deliberately tight.
+    let rate_limit_per_minute = std::env::var("RATE_LIMIT_PER_MINUTE")
+        .ok()
+        .and_then(|v| v.parse::<u32>().ok())
+        .unwrap_or(5);
+
+    // Minimum gap between emails to the same address (verification links and
+    // magic links each on their own clock). 0 disables.
+    let email_cooldown_seconds = std::env::var("EMAIL_COOLDOWN_SECONDS")
+        .ok()
+        .and_then(|v| v.parse::<i64>().ok())
+        .unwrap_or(30);
+
     // Session-cookie scoping. No COOKIE_DOMAIN means a host-only cookie (what
     // localhost dev wants); COOKIE_SECURE defaults on and is only disabled for
     // plain-HTTP local dev.
@@ -147,6 +162,8 @@ async fn main() -> anyhow::Result<()> {
         session_ttl_days,
         login_link_ttl_minutes,
         cookie,
+        rate_limit_per_minute,
+        email_cooldown_seconds,
         oidc,
     };
 
@@ -155,9 +172,14 @@ async fn main() -> anyhow::Result<()> {
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     let listener = tokio::net::TcpListener::bind(addr).await?;
     tracing::info!("listening on {addr}");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
+    // Connect info gives the rate limiter its peer-address fallback for
+    // requests without X-Forwarded-For (local dev / direct calls).
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
 
     Ok(())
 }

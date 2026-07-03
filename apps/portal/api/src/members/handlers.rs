@@ -25,10 +25,19 @@ pub async fn create_member(
 
     match repo::submit_member(&state.db.load(), &member).await? {
         SubmitOutcome::NeedsVerification { member_id } => {
-            let token =
-                repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
-                    .await?;
-            send_link(&state, &member.institutional_email, &token).await?;
+            // Per-address cooldown: if a verification email just went out, do
+            // not send another — the earlier link still works, and the `202`
+            // below is unchanged (no enumeration signal).
+            if repo::recently_issued(&state.db.load(), member_id, state.email_cooldown_seconds)
+                .await?
+            {
+                tracing::info!("verification email cooldown active — not re-sending");
+            } else {
+                let token =
+                    repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
+                        .await?;
+                send_link(&state, &member.institutional_email, &token).await?;
+            }
         }
         SubmitOutcome::AlreadyActive => {
             tracing::info!("join submission for an already-active member — ignored");
@@ -62,9 +71,15 @@ pub async fn resend_verification(
     let email = validate_institutional_email(&payload.institutional_email)?;
 
     if let Some(member_id) = repo::pending_member_id(&state.db.load(), &email).await? {
-        let token =
-            repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours).await?;
-        send_link(&state, &email, &token).await?;
+        // Same per-address cooldown as the join path (see `create_member`).
+        if repo::recently_issued(&state.db.load(), member_id, state.email_cooldown_seconds).await? {
+            tracing::info!("verification email cooldown active — not re-sending");
+        } else {
+            let token =
+                repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
+                    .await?;
+            send_link(&state, &email, &token).await?;
+        }
     }
 
     Ok((

@@ -134,6 +134,13 @@ pub async fn request_magic_link(
 ) -> Result<(StatusCode, Json<StatusResponse>), AppError> {
     let email = validate_institutional_email(&payload.institutional_email)?;
 
+    // Per-address cooldown: a sign-in link just went out to this address, and
+    // it is still the valid one — answer the same enumeration-safe `202`
+    // without sending another email.
+    if magic::recently_requested(&state.db.load(), &email, state.email_cooldown_seconds).await? {
+        return Ok((StatusCode::ACCEPTED, Json(StatusResponse::new("link_sent"))));
+    }
+
     if let Some((_member_id, token)) =
         magic::request_login_token(&state.db.load(), &email, state.login_link_ttl_minutes).await?
     {

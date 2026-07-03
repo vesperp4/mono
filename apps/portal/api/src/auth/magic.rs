@@ -58,6 +58,31 @@ pub async fn request_login_token(
     Ok(Some((member_id, token)))
 }
 
+/// True when a login token (and thus an email) already went out for this
+/// address within the last `cooldown_secs`. The handler uses this to skip
+/// re-sending — the earlier link is still the valid one — bounding how fast a
+/// third party can make us email an address. Unknown addresses simply have no
+/// tokens, so this stays enumeration-neutral. `0` disables.
+pub async fn recently_requested(
+    db: &PgPool,
+    institutional_email: &str,
+    cooldown_secs: i64,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS (
+            SELECT 1
+              FROM login_tokens lt
+              JOIN members m ON m.id = lt.member_id
+             WHERE m.institutional_email = $1
+               AND lt.created_at > now() - make_interval(secs => $2)
+        )",
+    )
+    .bind(institutional_email)
+    .bind(cooldown_secs as f64)
+    .fetch_one(db)
+    .await
+}
+
 /// Consume a login token: if it is unknown, used, expired, or its member is no
 /// longer active, return `None`. Otherwise mark it consumed and return the
 /// member id, atomically — the UPDATE both locks the row and burns the token,
