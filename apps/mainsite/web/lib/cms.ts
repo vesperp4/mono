@@ -2,15 +2,12 @@
 // no token). Uses plain fetch instead of @sanity/client to keep the bundle
 // lean — same pattern as apps/tv/web/lib/schedule.ts.
 //
-// The Sanity project has NOT been created yet, so the fallback below is empty
-// and every query short-circuits to an empty result (the site builds and
-// deploys with zero Sanity config). Once the project exists at
-// sanity.io/manage, hardcode its id here as the fallback (it is public, not a
-// secret — same as tv/web) and in apps/mainsite/studio/sanity.config.ts.
+// The project id is public, not a secret (same as tv/web) — created 2026-07-03
+// at sanity.io/manage, org Vesper P4, separate from the TV project.
 
 import type { PortableTextBlock } from "@portabletext/react";
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "";
+const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "3osgfq6s";
 const DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
 const API_VERSION = "v2024-01-01";
 

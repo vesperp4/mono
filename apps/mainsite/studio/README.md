@@ -15,21 +15,15 @@ is its own product.
 - `event` — chapter event (title, slug, start/end, location, description,
   optional RSVP URL and image); split into upcoming/past on the site
 
+Project id: `3osgfq6s` (created 2026-07-03, org Vesper P4). It is public
+(read-only GROQ against a public dataset), not a secret — same as
+tv-studio / tv-web — and is the hardcoded fallback in both `sanity.config.ts`
+(here) and `apps/mainsite/web/lib/cms.ts`.
+
 ## Setup (once)
 
-1. Create the Sanity project at sanity.io/manage (org Vesper P4); note the
-   projectId. **The project does not exist yet** — until then the config falls
-   back to an empty id (fine for `sanity build`; `dev`/`deploy` need the real
-   one).
-2. Fill in the real projectId as the fallback in **both** `sanity.config.ts`
-   (here) and `apps/mainsite/web/lib/cms.ts`. The id is public (read-only GROQ
-   against a public dataset), not a secret — same as tv-studio / tv-web.
-3. `SANITY_STUDIO_PROJECT_ID=<id> pnpm --filter mainsite-studio dev` to run
-   locally (or just `pnpm --filter mainsite-studio dev` once the fallback is
-   filled in).
-4. `pnpm --filter mainsite-studio deploy` hosts the Studio at
+1. `pnpm --filter mainsite-studio dev` to run locally.
+2. `pnpm --filter mainsite-studio deploy` hosts the Studio at
    `<name>.sanity.studio` — no Azure resources needed.
-
-After the project exists, also configure the publish webhook so content changes
-redeploy the site — see the comment in
-`.github/workflows/mainsite-web-deploy.yaml`.
+3. Configure the publish webhook so content changes redeploy the site — see
+   the comment in `.github/workflows/mainsite-web-deploy.yaml`.
