@@ -11,6 +11,11 @@ pub enum AppError {
     Validation(String),
     /// Verification token unknown, already used, or expired (410).
     InvalidToken,
+    /// No valid session: cookie missing, token unknown, session expired or
+    /// revoked, or the member is no longer active (401). One deliberately
+    /// generic message for every case — the reason is never disclosed, so the
+    /// response can't be used to probe sessions or membership status.
+    Unauthorized,
     /// Anything unexpected (DB, email, …) — logged, surfaced as a generic 500.
     Internal(anyhow::Error),
 }
@@ -23,6 +28,11 @@ impl AppError {
                 StatusCode::GONE,
                 "invalid_token",
                 "This confirmation link is invalid or has expired. Request a new one.".to_string(),
+            ),
+            AppError::Unauthorized => (
+                StatusCode::UNAUTHORIZED,
+                "unauthorized",
+                "Sign in to access this resource.".to_string(),
             ),
             AppError::Internal(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,

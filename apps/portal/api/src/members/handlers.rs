@@ -2,10 +2,15 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::Json;
 
+use crate::auth::extract::CurrentMember;
 use crate::error::AppError;
-use crate::members::model::{ConfirmRequest, NewMember, ResendRequest, StatusResponse};
+use crate::members::model::{
+    ConfirmRequest, MemberProfile, NewMember, ResendRequest, StatusResponse, UpdateMemberRequest,
+};
 use crate::members::repo::{self, SubmitOutcome};
-use crate::members::validate::{validate_institutional_email, validate_new_member};
+use crate::members::validate::{
+    validate_institutional_email, validate_member_update, validate_new_member,
+};
 use crate::state::AppState;
 
 /// `POST /api/v1/members` — accept a join submission and (re)send a verification
@@ -66,6 +71,41 @@ pub async fn resend_verification(
         StatusCode::ACCEPTED,
         Json(StatusResponse::new("pending_verification")),
     ))
+}
+
+/// `GET /api/v1/members/me` — the authenticated member's profile. Auth is
+/// entirely the [`CurrentMember`] extractor; reaching the body means the
+/// session is valid and the member is active.
+pub async fn get_me(
+    State(state): State<AppState>,
+    CurrentMember(member): CurrentMember,
+) -> Result<Json<MemberProfile>, AppError> {
+    let profile = repo::member_profile(&state.db.load(), member.member_id)
+        .await?
+        // The row vanished between session validation and this read — treat it
+        // like any other dead session.
+        .ok_or(AppError::Unauthorized)?;
+
+    Ok(Json(profile))
+}
+
+/// `PATCH /api/v1/members/me` — partial self-service update of the mutable
+/// fields (personal email, concentration, department, newsletter opt-in);
+/// returns the updated profile in the same shape as `GET`. The payload type
+/// cannot express institutional email or status, and its
+/// `deny_unknown_fields` makes sending them a `422`.
+pub async fn update_me(
+    State(state): State<AppState>,
+    CurrentMember(member): CurrentMember,
+    Json(payload): Json<UpdateMemberRequest>,
+) -> Result<Json<MemberProfile>, AppError> {
+    let update = validate_member_update(payload)?;
+
+    let profile = repo::update_member_profile(&state.db.load(), member.member_id, &update)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    Ok(Json(profile))
 }
 
 /// Build the confirmation URL and hand it to the email provider.

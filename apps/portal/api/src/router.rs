@@ -43,7 +43,7 @@ pub fn build_router(state: AppState) -> Router {
 
     let cors = CorsLayer::new()
         .allow_origin(AllowOrigin::list(origins))
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::PATCH])
         .allow_headers([header::CONTENT_TYPE])
         // The session cookie must ride along on the portal's fetch() calls
         // (`credentials: "include"`), which browsers only honor when this
@@ -54,6 +54,10 @@ pub fn build_router(state: AppState) -> Router {
     Router::new()
         .route("/health", get(health))
         .route("/api/v1/members", post(members::handlers::create_member))
+        .route(
+            "/api/v1/members/me",
+            get(members::handlers::get_me).patch(members::handlers::update_me),
+        )
         .route(
             "/api/v1/members/confirm",
             post(members::handlers::confirm_member),

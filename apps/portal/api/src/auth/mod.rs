@@ -3,6 +3,8 @@
 //!
 //! - `session`  — mint/validate/revoke sessions + the session cookie. THE
 //!   session module: member-facing endpoints (#172) build only on this.
+//! - `extract`  — the `CurrentMember` extractor member-facing handlers use to
+//!   require a signed-in member (cookie → `session::validate_session`).
 //! - `magic`    — one-time email login tokens.
 //! - `oidc`     — Microsoft Entra ID authorization-code + PKCE flow.
 //! - `handlers` — the `/api/v1/auth/*` HTTP handlers.
@@ -15,6 +17,7 @@
 //!   an address is unknown, pending, or active — nothing here can be used to
 //!   probe who is registered.
 
+pub mod extract;
 pub mod handlers;
 pub mod magic;
 pub mod oidc;
