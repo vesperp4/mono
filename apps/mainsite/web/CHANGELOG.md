@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.2.0...mainsite-web-v0.3.0) (2026-07-03)
+
+
+### Features
+
+* **mainsite:** sanity events listing + blog ([#187](https://github.com/vesperp4/mono/issues/187)) ([da2d52f](https://github.com/vesperp4/mono/commit/da2d52f98f9018e62878d0d1482bf7302a743119))
+
 ## [0.2.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.1.1...mainsite-web-v0.2.0) (2026-06-17)
 
 
