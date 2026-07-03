@@ -148,6 +148,28 @@ pub async fn issue_token(
     Ok(token)
 }
 
+/// True when a verification token (and thus an email) was already issued for
+/// this member within the last `cooldown_secs`. The send paths use this to
+/// skip re-sending — the earlier link is still the valid one — bounding how
+/// fast a third party can make us email an address. `0` disables.
+pub async fn recently_issued(
+    db: &PgPool,
+    member_id: Uuid,
+    cooldown_secs: i64,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS (
+            SELECT 1 FROM member_verifications
+             WHERE member_id = $1
+               AND created_at > now() - make_interval(secs => $2)
+        )",
+    )
+    .bind(member_id)
+    .bind(cooldown_secs as f64)
+    .fetch_one(db)
+    .await
+}
+
 /// Consume a verification token: if it is unknown, used, or expired, return
 /// `false`. Otherwise mark it consumed and activate the member, atomically.
 pub async fn confirm_token(db: &PgPool, raw_token: &str) -> Result<bool, sqlx::Error> {

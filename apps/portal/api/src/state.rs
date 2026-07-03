@@ -28,6 +28,15 @@ pub struct AppState {
     pub login_link_ttl_minutes: i64,
     /// Session-cookie scoping (Domain/Secure).
     pub cookie: CookieConfig,
+    /// Per-client-IP request allowance per minute on the public email-sending
+    /// endpoints (join, resend, magic-link). In-memory, so enforced per
+    /// replica. See `rate_limit` module docs.
+    pub rate_limit_per_minute: u32,
+    /// Server-side cooldown between emails to the same address, in seconds
+    /// (join/resend and magic-link each track their own token table). Within
+    /// the cooldown the endpoints still answer their enumeration-safe `202`,
+    /// they just don't send another email. `0` disables.
+    pub email_cooldown_seconds: i64,
     /// Microsoft OIDC sign-in, when configured. `None` makes the
     /// `/auth/oidc/*` endpoints return `503`; the magic-link flow is
     /// unaffected.
