@@ -28,6 +28,7 @@ describe('cms', () => {
     expect(await cms.getPostSlugs()).toEqual([])
     expect(await cms.getUpcomingEvents()).toEqual([])
     expect(await cms.getPastEvents()).toEqual([])
+    expect(await cms.getTeamMembers()).toEqual([])
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -66,6 +67,32 @@ describe('cms', () => {
     expect(url.searchParams.get('$slug')).toBe('"hello"')
   })
 
+  it('queries team members ordered by the manual sort key', async () => {
+    const members = [
+      {
+        _id: 'm1',
+        name: 'Vesper Member',
+        role: 'Webmaster',
+        order: 1,
+        photo: null,
+        linkedinUrl: 'https://www.linkedin.com/in/vesper',
+        githubUrl: null,
+      },
+    ]
+    const fetchMock = vi.fn().mockResolvedValue(okResponse(members))
+    vi.stubGlobal('fetch', fetchMock)
+    const cms = await loadCms('testproj')
+
+    expect(await cms.getTeamMembers()).toEqual(members)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const url = new URL(String(fetchMock.mock.calls[0]?.[0]))
+    expect(url.origin).toBe('https://testproj.api.sanity.io')
+    expect(url.pathname).toBe('/v2024-01-01/data/query/production')
+    const query = url.searchParams.get('query')
+    expect(query).toContain('_type == "teamMember"')
+    expect(query).toContain('order(order asc)')
+  })
+
   it('returns empty results on a non-OK response', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ok: false} as Response)
     vi.stubGlobal('fetch', fetchMock)
@@ -74,6 +101,7 @@ describe('cms', () => {
     expect(await cms.getPosts()).toEqual([])
     expect(await cms.getPost('hello')).toBeNull()
     expect(await cms.getUpcomingEvents()).toEqual([])
+    expect(await cms.getTeamMembers()).toEqual([])
     expect(fetchMock).toHaveBeenCalled()
   })
 
@@ -84,5 +112,6 @@ describe('cms', () => {
 
     expect(await cms.getPosts()).toEqual([])
     expect(await cms.getPastEvents()).toEqual([])
+    expect(await cms.getTeamMembers()).toEqual([])
   })
 })

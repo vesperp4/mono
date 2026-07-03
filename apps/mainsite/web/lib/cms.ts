@@ -41,6 +41,16 @@ export interface Post extends PostSummary {
   body: PostBody | null;
 }
 
+export interface TeamMember {
+  _id: string;
+  name: string;
+  role: string;
+  order: number;
+  photo: CmsImage | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+}
+
 export interface CmsEvent {
   _id: string;
   title: string;
@@ -92,6 +102,16 @@ const EVENT_PROJECTION = `{
   "image": image{ "url": asset->url, alt }
 }`;
 
+const TEAM_MEMBER_PROJECTION = `{
+  _id,
+  name,
+  role,
+  order,
+  "photo": photo{ "url": asset->url, alt },
+  linkedinUrl,
+  githubUrl
+}`;
+
 /** Published posts (publishedAt in the past), newest first. */
 export async function getPosts(): Promise<PostSummary[]> {
   const posts = await groq<PostSummary[]>(
@@ -125,6 +145,14 @@ export async function getUpcomingEvents(): Promise<CmsEvent[]> {
     `*[_type == "event" && coalesce(end, start) >= now()] | order(start asc) ${EVENT_PROJECTION}`,
   );
   return events ?? [];
+}
+
+/** Team roster members, in manual roster order (lowest `order` first). */
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  const members = await groq<TeamMember[]>(
+    `*[_type == "teamMember"] | order(order asc) ${TEAM_MEMBER_PROJECTION}`,
+  );
+  return members ?? [];
 }
 
 /** Events that already ended, most recent first (capped at 24). */

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MEDIA } from "@/lib/media";
+import { PORTAL_SIGNUP_URL } from "@/lib/site";
 
 export default function Hero() {
   const scrollTo = (id: string) => {
@@ -99,7 +99,7 @@ export default function Hero() {
                 Explore Pillars
               </button>
               <a
-                href="https://portal.vesperp4.com/signup"
+                href={PORTAL_SIGNUP_URL}
                 className="px-8 py-3.5 border border-white/30 text-white text-xs font-semibold tracking-widest uppercase hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]"
               >
                 Join Us
