@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/vesperp4/mono/compare/portal-api-v0.8.1...portal-api-v0.8.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* **portal-api:** close email enumeration, fail closed on missing ACS, handle SIGTERM ([#199](https://github.com/vesperp4/mono/issues/199)) ([f610c72](https://github.com/vesperp4/mono/commit/f610c72881c21bd8c1dfb798678c7e434ea3fa62))
+
 ## [0.8.1](https://github.com/vesperp4/mono/compare/portal-api-v0.8.0...portal-api-v0.8.1) (2026-07-03)
 
 
