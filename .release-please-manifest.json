@@ -1,5 +1,5 @@
 {
-  "apps/portal/api": "0.7.0",
+  "apps/portal/api": "0.8.0",
   "apps/mainsite/web": "0.2.0",
   "apps/portal/web": "0.3.0",
   "apps/tv/web": "0.3.0",
