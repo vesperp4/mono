@@ -36,7 +36,7 @@ pub async fn create_member(
                 let token =
                     repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
                         .await?;
-                send_link(&state, &member.institutional_email, &token).await?;
+                spawn_verification_email(&state, &member.institutional_email, &token);
             }
         }
         SubmitOutcome::AlreadyActive => {
@@ -78,7 +78,7 @@ pub async fn resend_verification(
             let token =
                 repo::issue_token(&state.db.load(), member_id, state.verification_ttl_hours)
                     .await?;
-            send_link(&state, &email, &token).await?;
+            spawn_verification_email(&state, &email, &token);
         }
     }
 
@@ -123,12 +123,19 @@ pub async fn update_me(
     Ok(Json(profile))
 }
 
-/// Build the confirmation URL and hand it to the email provider.
-async fn send_link(state: &AppState, to: &str, token: &str) -> Result<(), AppError> {
+/// Build the confirmation URL and send it in the background. Fire-and-forget on
+/// purpose: the HTTP response must not wait on — or reflect the success of — the
+/// send, so timing and status are identical whether or not the address is a real
+/// pending member (no enumeration signal; an ACS failure must never turn into a
+/// 500 for a registered address while an unknown one gets 202). Failures are
+/// logged. Best-effort across shutdown; the user can re-request.
+fn spawn_verification_email(state: &AppState, to: &str, token: &str) {
+    let email = state.email.clone();
+    let to = to.to_string();
     let link = format!("{}/confirm?token={}", state.public_base_url, token);
-    state
-        .email
-        .send_verification(to, &link)
-        .await
-        .map_err(AppError::Internal)
+    tokio::spawn(async move {
+        if let Err(err) = email.send_verification(&to, &link).await {
+            tracing::error!(target: "email", error = %err, "verification email send failed");
+        }
+    });
 }
