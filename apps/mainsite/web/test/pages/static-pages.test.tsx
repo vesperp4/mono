@@ -40,7 +40,7 @@ describe('/projects', () => {
       ['VesperP4 TV', 'https://dev.vesperp4.tv'],
     ] as const) {
       expect(screen.getByRole('heading', {name})).toBeInTheDocument()
-      expect(screen.getByRole('link', {name: new RegExp(`visit ${url.replace('https://', '')}`, 'i')})).toHaveAttribute('href', url)
+      expect(screen.getByRole('link', {name: `Visit ${url.replace('https://', '')} →`})).toHaveAttribute('href', url)
     }
     expect(screen.getByText('More on the way')).toBeInTheDocument()
   })
