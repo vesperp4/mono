@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/vesperp4/mono/compare/portal-api-v0.7.0...portal-api-v0.8.0) (2026-07-03)
+
+
+### Features
+
+* **portal-api:** authenticated member endpoints — GET/PATCH /members/me ([#180](https://github.com/vesperp4/mono/issues/180)) ([a2d35f1](https://github.com/vesperp4/mono/commit/a2d35f1c8eaf8f17273bb5e223743fdcf15ae950))
+* **portal-api:** per-IP rate limiting on public email endpoints ([#181](https://github.com/vesperp4/mono/issues/181)) ([7449608](https://github.com/vesperp4/mono/commit/7449608130512180ce03be9af6cf008bd7fedf5c))
+
 ## [0.7.0](https://github.com/vesperp4/mono/compare/portal-api-v0.6.0...portal-api-v0.7.0) (2026-07-02)
 
 
