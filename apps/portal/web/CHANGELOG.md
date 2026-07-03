@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/vesperp4/mono/compare/portal-web-v0.4.0...portal-web-v0.4.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **portal-web:** don't force sign-out when the API is unreachable ([#194](https://github.com/vesperp4/mono/issues/194)) ([62b623a](https://github.com/vesperp4/mono/commit/62b623a00ea6fb4d89b63b570d5fd8a34d75530c))
+
 ## [0.4.0](https://github.com/vesperp4/mono/compare/portal-web-v0.3.0...portal-web-v0.4.0) (2026-07-03)
 
 
