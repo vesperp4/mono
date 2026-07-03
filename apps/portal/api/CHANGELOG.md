@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/vesperp4/mono/compare/portal-api-v0.8.2...portal-api-v0.8.3) (2026-07-03)
+
+
+### Bug Fixes
+
+* **portal-api:** upgrade jsonwebtoken to 10.x for CVE-2026-25537 ([#203](https://github.com/vesperp4/mono/issues/203)) ([e29c544](https://github.com/vesperp4/mono/commit/e29c54439ee759763d99a9d827d8eb9af4d1c857))
+
 ## [0.8.2](https://github.com/vesperp4/mono/compare/portal-api-v0.8.1...portal-api-v0.8.2) (2026-07-03)
 
 
