@@ -10,8 +10,13 @@ import { useSession } from "@/lib/session";
 // rendered — the links fade in once the state is known instead of flashing
 // the wrong variant and swapping.
 export default function SiteHeader() {
-  const { member, loading, signOut } = useSession();
+  const { member, loading, error, signOut } = useSession();
   const [signingOut, setSigningOut] = useState(false);
+
+  // While the session is loading OR unknown (API unreachable), don't commit to
+  // either auth variant — showing "Sign In / Join" during an outage would be
+  // misleading for a member who is actually signed in.
+  const pending = loading || error;
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -36,9 +41,9 @@ export default function SiteHeader() {
 
         <div
           className={`flex items-center gap-5 sm:gap-7 transition-opacity duration-300 ${
-            loading ? "opacity-0 pointer-events-none" : "opacity-100"
+            pending ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
-          aria-hidden={loading}
+          aria-hidden={pending}
         >
           {member ? (
             <>
@@ -47,7 +52,7 @@ export default function SiteHeader() {
               <button
                 type="button"
                 onClick={handleSignOut}
-                disabled={signingOut || loading}
+                disabled={signingOut || pending}
                 className="text-[10px] font-semibold tracking-widest uppercase border border-zinc-800 px-4 py-2 text-zinc-300 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {signingOut ? "Signing Out…" : "Sign Out"}

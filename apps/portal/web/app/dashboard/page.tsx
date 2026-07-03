@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import StatusBadge from "@/components/StatusBadge";
+import SessionError from "@/components/SessionError";
 import { useRequireSession, type Member } from "@/lib/session";
 
 // Signed-in landing page — the redirect target for both the OIDC callback and
@@ -10,7 +11,11 @@ import { useRequireSession, type Member } from "@/lib/session";
 // /signin once GET /members/me answers 401 (see lib/session.tsx for why this
 // is not middleware).
 export default function DashboardPage() {
-  const { member, loading } = useRequireSession();
+  const { member, loading, error, refresh } = useRequireSession();
+
+  if (error && !member) {
+    return <SessionError onRetry={refresh} />;
+  }
 
   if (loading || !member) {
     return (
