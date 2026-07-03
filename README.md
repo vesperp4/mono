@@ -31,7 +31,7 @@ CS/engineering chapter at Polytechnic University of Puerto Rico.
 | Streaming (TV)   | Eyevinn Channel Engine (VOD2Live) + ffmpeg HLS packaging + hls.js |
 | Web hosting      | Azure Static Web Apps                          |
 | API hosting      | Azure Container Apps (images in ACR)           |
-| Auth (planned)   | Microsoft OIDC SSO + magic-link fallback       |
+| Auth             | Microsoft OIDC SSO (PUPR tenant) + magic-link fallback |
 | CI/CD            | GitHub Actions                                 |
 | IaC              | Azure Bicep — separate infra repo              |
 
@@ -74,10 +74,10 @@ apps/
     components/     UI components
     lib/            Utilities (Sanity client lands here in Phase 2)
   portal/web/       Member portal (Next.js) → portal.vesperp4.com
-    app/            Routes: /, /signup, /signin, /confirm
-    components/     UI components (join form, …)
+    app/            Routes: /, /signup, /signin, /confirm, /auth, /dashboard, /profile
+    components/     UI components (join form, profile form, header, …)
   portal/api/       Members API (Rust: Axum + sqlx) → Azure Container Apps
-    src/            Service code (router, members domain, email, db)
+    src/            Service code (router, members + auth domains, email, rate limiting, db)
     migrations/     sqlx migrations
   tv/web/           TV site (Next.js + hls.js player) → vesperp4.tv
   tv/engine/        24/7 playout service (Eyevinn Channel Engine) → Azure Container Apps
@@ -133,7 +133,7 @@ itself has no login.
 | ------ | -------------------------------------------------------------- | -------------- |
 | **1**  | Public showcase — landing, about, team, projects, contact      | 🚧 In progress |
 | **2**  | Events listing + blog (Sanity CMS)                             | 📋 Planned     |
-| **3**  | Member portal — email-verified signup live; SSO sign-in next   | 🚧 In progress |
+| **3**  | Member portal — signup, Microsoft SSO + magic-link sign-in, dashboard & profile | ✅ Live |
 | **TV** | 24/7 streaming channel → vesperp4.tv ([tracking #166](https://github.com/vesperp4/mono/issues/166)) | 🚧 Dev on air  |
 
 ---
