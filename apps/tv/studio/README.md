@@ -17,8 +17,9 @@ This is a **separate Sanity project** from the Phase 2 mainsite CMS.
 
 1. Create the Sanity project at sanity.io/manage; note the projectId.
 2. `SANITY_STUDIO_PROJECT_ID=<id> pnpm --filter tv-studio dev` to run locally.
-3. `pnpm --filter tv-studio deploy` hosts the Studio at `<name>.sanity.studio` —
-   no Azure resources needed.
+3. `pnpm --filter tv-studio run deploy` (the `run` is required — plain `deploy`
+   hits pnpm's built-in deploy command) hosts the Studio at
+   `<name>.sanity.studio` — no Azure resources needed.
 
 Overlap validation is advisory only (see scheduleSlot notes) — tv-engine
 tolerates conflicting slots by design.

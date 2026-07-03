@@ -23,7 +23,8 @@ tv-studio / tv-web — and is the hardcoded fallback in both `sanity.config.ts`
 ## Setup (once)
 
 1. `pnpm --filter mainsite-studio dev` to run locally.
-2. `pnpm --filter mainsite-studio deploy` hosts the Studio at
+2. `pnpm --filter mainsite-studio run deploy` (the `run` is required —
+   plain `deploy` hits pnpm's built-in deploy command) hosts the Studio at
    `<name>.sanity.studio` — no Azure resources needed.
 3. Configure the publish webhook so content changes redeploy the site — see
    the comment in `.github/workflows/mainsite-web-deploy.yaml`.
