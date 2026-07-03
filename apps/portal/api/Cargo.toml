@@ -27,7 +27,11 @@ azure_identity = "1.0.0"
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 hex = "0.4"
-jsonwebtoken = "9"
+# 10.x makes the crypto backend an explicit choice: aws_lc_rs over rust_crypto
+# because aws-lc is already in the tree (via the Azure SDK) and rust_crypto
+# would add the `rsa` crate, whose Marvin advisory (RUSTSEC-2023-0071) has no
+# fix. default-features off drops PEM support we don't use (JWKS components).
+jsonwebtoken = { version = "10.3", default-features = false, features = ["aws_lc_rs"] }
 rand = "0.8"
 # default-features off to drop the OpenSSL-backed default TLS; rustls matches the
 # distroless runtime (no system OpenSSL) and the ring backend sqlx already uses.

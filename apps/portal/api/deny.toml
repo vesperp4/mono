@@ -7,15 +7,11 @@
 # (portal-api-security.yaml); PR CI runs only `check bans licenses sources`.
 yanked = "deny"
 
-# Accepted advisories. Only add an entry when an advisory has NO fix available
-# AND is not exercised by our usage — always with a reason. Every other
-# advisory (including any with an available fix) must still fail the scan.
-ignore = [
-    # rsa "Marvin Attack" timing sidechannel. No fixed upgrade upstream; pulled
-    # only transitively via sqlx's macro support, not exercised by our
-    # Postgres-only usage. Re-evaluate when a patched `rsa` is released.
-    { id = "RUSTSEC-2023-0071", reason = "no upstream fix; sqlx macro-only transitive dep, not exercised at runtime" },
-]
+# Accepted advisories. Keep this EMPTY. Only add an entry when an advisory has
+# NO fix available AND is not exercised by our usage — always with a `reason`
+# and an open tracking issue stating when to re-evaluate. Every other advisory
+# (including any with an available fix) must fail the scan and be fixed instead.
+ignore = []
 
 [bans]
 multiple-versions = "warn"
