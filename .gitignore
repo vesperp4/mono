@@ -9,6 +9,9 @@ dist/
 # turbo
 .turbo/
 
+# test coverage output (vitest --coverage)
+coverage/
+
 # env files
 .env
 .env.local
