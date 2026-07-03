@@ -5,15 +5,22 @@
 //! keeps the client-IP policy and the JSON error envelope under our control
 //! with zero new dependencies to audit.
 //!
-//! **Client identity.** The API runs behind the Azure Container Apps ingress,
-//! so the TCP peer is always the ingress; the real client arrives in
-//! `X-Forwarded-For`, first entry. Policy, in order:
-//! - `X-Forwarded-For` present and its first entry parses as an IP (with or
-//!   without a port): key by that IP.
-//! - `X-Forwarded-For` present but unparseable: key into one shared
-//!   [`ClientKey::Opaque`] bucket. The ingress always writes a well-formed
-//!   header, so this only happens off-platform — sharing a bucket fails
-//!   closed (garbage can't mint fresh buckets to bypass the limit).
+//! **Client identity.** The API runs behind the Azure Container Apps ingress
+//! (Envoy), so the TCP peer is always the ingress; the real client arrives in
+//! `X-Forwarded-For`. The trustworthy entry is NOT the first one — a client can
+//! pre-populate `X-Forwarded-For` and Envoy only *appends* the address of the
+//! connection it terminates. With one trusted proxy in front of us (Envoy;
+//! Cloudflare is DNS-only for the API host) the real client is therefore the
+//! **last** entry, and everything to its left is attacker-controlled. Reading
+//! the first entry would let anyone mint an unlimited number of buckets with a
+//! spoofed header and bypass the limiter entirely. Policy, in order:
+//! - `X-Forwarded-For` present: take the entry [`TRUSTED_PROXY_HOPS`] from the
+//!   right (the hop our own infra appended). If it parses as an IP (with or
+//!   without a port), key by that IP.
+//! - `X-Forwarded-For` present but that entry is missing/unparseable: key into
+//!   one shared [`ClientKey::Opaque`] bucket. The ingress always appends a
+//!   well-formed address, so this only happens off-platform — sharing a bucket
+//!   fails closed (garbage can't mint fresh buckets to bypass the limit).
 //! - No `X-Forwarded-For`: key by the connection peer address (local dev,
 //!   direct calls); if the server wasn't set up with connect info, fall back
 //!   to the shared bucket.
@@ -38,6 +45,14 @@ use serde_json::json;
 /// Fixed-window length. Limits are configured as requests **per minute**.
 const WINDOW: Duration = Duration::from_secs(60);
 
+/// Number of trusted reverse proxies in front of the app that append to
+/// `X-Forwarded-For`. The Azure Container Apps ingress (Envoy) is the only one
+/// — Cloudflare is DNS-only / grey-cloud for the API host — so the client is
+/// the last (rightmost) entry Envoy appended. If a proxy that also rewrites
+/// `X-Forwarded-For` is ever added in front of ACA, bump this so the client IP
+/// is read from the correct hop.
+const TRUSTED_PROXY_HOPS: usize = 1;
+
 /// Who a request is attributed to for limiting purposes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ClientKey {
@@ -54,11 +69,26 @@ pub fn client_key(headers: &HeaderMap, peer: Option<SocketAddr>) -> ClientKey {
         Some(value) => value
             .to_str()
             .ok()
-            .and_then(|v| v.split(',').next())
-            .and_then(|first| parse_forwarded_ip(first.trim()))
+            .and_then(trusted_client_ip)
             .map_or(ClientKey::Opaque, ClientKey::Ip),
         None => peer.map_or(ClientKey::Opaque, |addr| ClientKey::Ip(addr.ip())),
     }
+}
+
+/// The client IP from an `X-Forwarded-For` value, trusting only the hop(s) our
+/// own infra appends. Envoy appends the address it terminates as the last
+/// entry, so with [`TRUSTED_PROXY_HOPS`] trusted proxies the client is that
+/// many entries from the right; anything to its left is client-supplied and
+/// spoofable, so it is never trusted. Returns `None` (=> the shared, fail-closed
+/// [`ClientKey::Opaque`] bucket) when that entry is missing or unparseable.
+fn trusted_client_ip(xff: &str) -> Option<IpAddr> {
+    let entries: Vec<&str> = xff
+        .split(',')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .collect();
+    let index = entries.len().checked_sub(TRUSTED_PROXY_HOPS)?;
+    parse_forwarded_ip(entries[index])
 }
 
 /// Parse one `X-Forwarded-For` entry: a bare IP (`203.0.113.7`, `2001:db8::1`)
@@ -212,17 +242,29 @@ mod tests {
     ));
 
     #[test]
-    fn xff_first_entry_wins() {
+    fn xff_uses_the_last_trusted_hop_not_the_first() {
+        // Envoy appends the real client (10.0.0.2) as the last entry; the
+        // leftmost is whatever the client sent and must be ignored.
         assert_eq!(
             client_key(&headers(Some("203.0.113.7, 10.0.0.1, 10.0.0.2")), PEER),
-            ClientKey::Ip(ip("203.0.113.7"))
+            ClientKey::Ip(ip("10.0.0.2"))
         );
+    }
+
+    #[test]
+    fn xff_spoofed_leading_entries_cannot_mint_new_buckets() {
+        // Two requests spoofing different leading IPs but arriving from the
+        // same real client must key to the SAME bucket (the appended entry).
+        let a = client_key(&headers(Some("1.1.1.1, 203.0.113.7")), PEER);
+        let b = client_key(&headers(Some("2.2.2.2, 203.0.113.7")), PEER);
+        assert_eq!(a, b);
+        assert_eq!(a, ClientKey::Ip(ip("203.0.113.7")));
     }
 
     #[test]
     fn xff_entry_with_port_parses() {
         assert_eq!(
-            client_key(&headers(Some("203.0.113.7:4711, 10.0.0.1")), PEER),
+            client_key(&headers(Some("10.0.0.1, 203.0.113.7:4711")), PEER),
             ClientKey::Ip(ip("203.0.113.7"))
         );
         assert_eq!(
@@ -250,6 +292,12 @@ mod tests {
             ClientKey::Opaque
         );
         assert_eq!(client_key(&headers(Some("")), PEER), ClientKey::Opaque);
+        // A parseable spoofed leading entry does NOT rescue an unparseable
+        // trusted hop — fail closed to the shared bucket, never trust the left.
+        assert_eq!(
+            client_key(&headers(Some("203.0.113.7, not-an-ip")), PEER),
+            ClientKey::Opaque
+        );
     }
 
     #[test]
