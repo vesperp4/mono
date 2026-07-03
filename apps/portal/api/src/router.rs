@@ -62,6 +62,12 @@ pub fn build_router(state: AppState) -> Router {
     );
 
     Router::new()
+        // Liveness: process-only, never touches the DB. A liveness probe that
+        // depended on Postgres would let a transient DB blip fail the probe and
+        // have the orchestrator kill (and restart-storm) otherwise-healthy
+        // replicas — each restart re-running migrations against the recovering
+        // DB. Readiness (`/health`) is the DB-aware check that gates traffic.
+        .route("/livez", get(livez))
         .route("/health", get(health))
         .route(
             "/api/v1/members",
@@ -102,6 +108,12 @@ pub fn build_router(state: AppState) -> Router {
         .layer(RequestBodyLimitLayer::new(MAX_BODY_BYTES))
         .layer(cors)
         .with_state(state)
+}
+
+/// Liveness: the process is up and serving. Deliberately does no I/O so a
+/// dependency outage never causes the orchestrator to restart a healthy pod.
+async fn livez() -> impl IntoResponse {
+    (StatusCode::OK, Json(json!({"status": "ok"})))
 }
 
 async fn health(State(state): State<AppState>) -> impl IntoResponse {
