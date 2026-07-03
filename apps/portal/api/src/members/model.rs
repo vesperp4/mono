@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -40,6 +41,46 @@ pub struct ConfirmRequest {
 #[serde(rename_all = "camelCase")]
 pub struct ResendRequest {
     pub institutional_email: String,
+}
+
+/// `PATCH /api/v1/members/me` payload — the self-editable subset of a member.
+///
+/// Institutional email and status are deliberately absent: the type simply
+/// cannot express them, and `deny_unknown_fields` turns any attempt to send
+/// them (or anything else unexpected) into a `422` instead of a silent ignore.
+///
+/// Every field is optional = partial update: omitted (or JSON `null`, which
+/// deserializes identically) means "leave unchanged". No field here is
+/// nullable in the schema, so there is no "clear this field" semantic and no
+/// double-`Option` is needed.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UpdateMemberRequest {
+    pub personal_email: Option<String>,
+    pub concentration: Option<String>,
+    pub department: Option<String>,
+    pub newsletter_opt_in: Option<bool>,
+}
+
+/// The authenticated member's profile, as returned by `GET`/`PATCH`
+/// `/api/v1/members/me`. Mirrors the members table; never any token or
+/// session material.
+#[derive(Debug, Serialize, sqlx::FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct MemberProfile {
+    pub id: Uuid,
+    pub first_name: String,
+    pub last_name: String,
+    pub personal_email: String,
+    pub institutional_email: String,
+    pub concentration: String,
+    pub department: String,
+    pub status: String,
+    pub newsletter_opt_in: bool,
+    /// When the member confirmed their institutional address (their "joined"
+    /// moment); `NULL` only while still pending, which `/me` can't be.
+    pub verified_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
 }
 
 /// Minimal member row used internally to decide resend vs. no-op.

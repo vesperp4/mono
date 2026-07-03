@@ -54,7 +54,12 @@ url = "2"
 uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
+# tower (util) + http-body-util drive the router in-process in the HTTP-level
+# integration tests (tests/members_me.rs). Both are already in the tree as
+# axum dependencies — no new crates in the lockfile.
+http-body-util = "0.1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tower = { version = "0.5", features = ["util"] }
 
 [profile.release]
 strip = true

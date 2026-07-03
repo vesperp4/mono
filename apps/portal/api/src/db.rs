@@ -31,6 +31,13 @@ const REFRESH_LEAD_SECS: i64 = 300;
 /// Entra token nears expiry. Always `.load()` it per use rather than caching.
 pub type SharedPool = Arc<ArcSwap<PgPool>>;
 
+/// Wrap an existing pool into a [`SharedPool`] handle (no refresh task).
+/// Used for the `DATABASE_URL` mode and by integration tests that build an
+/// `AppState` around a test pool.
+pub fn share(pool: PgPool) -> SharedPool {
+    Arc::new(ArcSwap::from_pointee(pool))
+}
+
 /// Initialize the database pool (see the module docs for the two modes).
 pub async fn init() -> anyhow::Result<SharedPool> {
     if let Ok(url) = std::env::var("DATABASE_URL") {
@@ -40,12 +47,12 @@ pub async fn init() -> anyhow::Result<SharedPool> {
             .connect(&url)
             .await
             .context("connecting via DATABASE_URL")?;
-        return Ok(Arc::new(ArcSwap::from_pointee(pool)));
+        return Ok(share(pool));
     }
 
     tracing::info!("connecting to Postgres passwordless (Entra token via managed identity)");
     let (pool, expires_at) = connect_passwordless().await?;
-    let shared: SharedPool = Arc::new(ArcSwap::from_pointee(pool));
+    let shared: SharedPool = share(pool);
     spawn_token_refresh(shared.clone(), expires_at);
     Ok(shared)
 }

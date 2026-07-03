@@ -1,5 +1,5 @@
 use crate::error::AppError;
-use crate::members::model::{NewMember, DEPARTMENTS, INSTITUTIONAL_DOMAINS};
+use crate::members::model::{NewMember, UpdateMemberRequest, DEPARTMENTS, INSTITUTIONAL_DOMAINS};
 
 /// A validated, normalized join submission ready to persist.
 pub struct ValidatedMember {
@@ -18,21 +18,9 @@ pub fn validate_new_member(input: NewMember) -> Result<ValidatedMember, AppError
     let last_name = non_empty(&input.last_name, "lastName")?;
     let concentration = non_empty(&input.concentration, "concentration")?;
 
-    let personal_email = normalize_email(&input.personal_email);
-    if !looks_like_email(&personal_email) {
-        return Err(AppError::Validation(
-            "personalEmail is not a valid email".into(),
-        ));
-    }
-
+    let personal_email = validate_personal_email(&input.personal_email)?;
     let institutional_email = validate_institutional_email(&input.institutional_email)?;
-
-    let department = input.department.trim().to_string();
-    if !DEPARTMENTS.contains(&department.as_str()) {
-        return Err(AppError::Validation(
-            "department is not a recognized value".into(),
-        ));
-    }
+    let department = validate_department(&input.department)?;
 
     Ok(ValidatedMember {
         first_name,
@@ -42,6 +30,66 @@ pub fn validate_new_member(input: NewMember) -> Result<ValidatedMember, AppError
         concentration,
         department,
     })
+}
+
+/// A validated, normalized self-service profile update (`PATCH /members/me`).
+/// `None` = field untouched; the repo layer turns that into a partial UPDATE.
+pub struct ValidatedUpdate {
+    pub personal_email: Option<String>,
+    pub concentration: Option<String>,
+    pub department: Option<String>,
+    pub newsletter_opt_in: Option<bool>,
+}
+
+/// Validate and normalize a `PATCH /members/me` payload. Present fields go
+/// through exactly the same checks as the join form; absent fields pass
+/// through as `None`.
+pub fn validate_member_update(input: UpdateMemberRequest) -> Result<ValidatedUpdate, AppError> {
+    let personal_email = input
+        .personal_email
+        .as_deref()
+        .map(validate_personal_email)
+        .transpose()?;
+    let concentration = input
+        .concentration
+        .as_deref()
+        .map(|c| non_empty(c, "concentration"))
+        .transpose()?;
+    let department = input
+        .department
+        .as_deref()
+        .map(validate_department)
+        .transpose()?;
+
+    Ok(ValidatedUpdate {
+        personal_email,
+        concentration,
+        department,
+        newsletter_opt_in: input.newsletter_opt_in,
+    })
+}
+
+/// Validate + normalize a personal (contact) email — any domain, just has to
+/// look like an address.
+pub fn validate_personal_email(raw: &str) -> Result<String, AppError> {
+    let email = normalize_email(raw);
+    if !looks_like_email(&email) {
+        return Err(AppError::Validation(
+            "personalEmail is not a valid email".into(),
+        ));
+    }
+    Ok(email)
+}
+
+/// Validate a department slug against the canonical [`DEPARTMENTS`] list.
+pub fn validate_department(raw: &str) -> Result<String, AppError> {
+    let department = raw.trim().to_string();
+    if !DEPARTMENTS.contains(&department.as_str()) {
+        return Err(AppError::Validation(
+            "department is not a recognized value".into(),
+        ));
+    }
+    Ok(department)
 }
 
 /// Validate + normalize an institutional email (also used by the resend path).

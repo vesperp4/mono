@@ -2,8 +2,8 @@ use chrono::{Duration, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::members::model::MemberRow;
-use crate::members::validate::ValidatedMember;
+use crate::members::model::{MemberProfile, MemberRow};
+use crate::members::validate::{ValidatedMember, ValidatedUpdate};
 use crate::token::{generate_token, hash_token};
 
 /// Outcome of a join submission, telling the handler whether to send mail.
@@ -48,6 +48,57 @@ pub async fn submit_member(db: &PgPool, m: &ValidatedMember) -> Result<SubmitOut
     };
 
     Ok(SubmitOutcome::NeedsVerification { member_id })
+}
+
+/// Fetch a member's full profile (`GET /members/me`). `None` only if the row
+/// vanished since the session was validated.
+///
+/// The column list must match `update_member_profile`'s RETURNING clause —
+/// both feed the same `MemberProfile`, so a drift breaks its `FromRow`.
+pub async fn member_profile(
+    db: &PgPool,
+    member_id: Uuid,
+) -> Result<Option<MemberProfile>, sqlx::Error> {
+    sqlx::query_as::<_, MemberProfile>(
+        "SELECT id, first_name, last_name, personal_email, institutional_email,
+                concentration, department, status, newsletter_opt_in,
+                verified_at, created_at
+           FROM members WHERE id = $1",
+    )
+    .bind(member_id)
+    .fetch_optional(db)
+    .await
+}
+
+/// Apply a partial self-service update and return the fresh profile
+/// (`PATCH /members/me`). `COALESCE` keeps the current value for every field
+/// the caller left as `None`, so one statement covers all partial shapes.
+/// Only the self-editable columns appear here — institutional email and
+/// status are structurally untouchable.
+pub async fn update_member_profile(
+    db: &PgPool,
+    member_id: Uuid,
+    update: &ValidatedUpdate,
+) -> Result<Option<MemberProfile>, sqlx::Error> {
+    sqlx::query_as::<_, MemberProfile>(
+        "UPDATE members
+            SET personal_email    = COALESCE($2, personal_email),
+                concentration     = COALESCE($3, concentration),
+                department        = COALESCE($4, department),
+                newsletter_opt_in = COALESCE($5, newsletter_opt_in),
+                updated_at        = now()
+          WHERE id = $1
+      RETURNING id, first_name, last_name, personal_email, institutional_email,
+                concentration, department, status, newsletter_opt_in,
+                verified_at, created_at",
+    )
+    .bind(member_id)
+    .bind(update.personal_email.as_deref())
+    .bind(update.concentration.as_deref())
+    .bind(update.department.as_deref())
+    .bind(update.newsletter_opt_in)
+    .fetch_optional(db)
+    .await
 }
 
 /// Find a still-pending member by institutional email (resend path).
