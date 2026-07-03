@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/vesperp4/mono/compare/portal-web-v0.3.0...portal-web-v0.4.0) (2026-07-03)
+
+
+### Features
+
+* **portal-web:** member dashboard and profile pages ([#183](https://github.com/vesperp4/mono/issues/183)) ([be0c9e8](https://github.com/vesperp4/mono/commit/be0c9e82815d3440d62031a62e2c3aacb357e34a))
+
 ## [0.3.0](https://github.com/vesperp4/mono/compare/portal-web-v0.2.0...portal-web-v0.3.0) (2026-07-02)
 
 
