@@ -43,10 +43,10 @@ jobs:
         if: github.event_name == 'pull_request' && github.base_ref != 'main'
         run: |
           pipx install commitizen
-          cz check --rev-range $(git merge-base HEAD origin/${{ github.base_ref }})..${{ github.event.pull_request.head.sha }}
+          cz check --rev-range "$(git merge-base HEAD 'origin/${{ github.base_ref }}')..${{ github.event.pull_request.head.sha }}"
 
-      - name: Audit dependencies
-        run: pnpm audit --prod
+      # pnpm audit moved to the scheduled npm-audit.yaml workflow: advisory
+      # checks are a property of time, not of the PR diff.
 
       - name: Check Formatting
         run: pnpm turbo format-check
