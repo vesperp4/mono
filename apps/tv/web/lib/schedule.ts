@@ -15,7 +15,9 @@ export interface ScheduleSlot {
 
 async function groq<T>(query: string): Promise<T | null> {
   if (!PROJECT_ID) return null; // unconfigured local dev — render placeholders
-  const url = `https://${PROJECT_ID}.api.sanity.io/${API_VERSION}/data/query/${DATASET}?query=${encodeURIComponent(query)}`;
+  // apicdn, not api: shares the TV project's quota with the engine's 24/7
+  // polling, and schedule display tolerates CDN staleness.
+  const url = `https://${PROJECT_ID}.apicdn.sanity.io/${API_VERSION}/data/query/${DATASET}?query=${encodeURIComponent(query)}`;
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) return null;
   const body = (await res.json()) as { result: T };
