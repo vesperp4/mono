@@ -7,6 +7,13 @@
 
 * **tv:** query Sanity via apicdn with cache, timeout, and stale fallback ([#214](https://github.com/vesperp4/mono/issues/214)) ([5f3453b](https://github.com/vesperp4/mono/commit/5f3453b7d248bd7ac2cec777eb6585f49589a6d0))
 
+## [0.3.1](https://github.com/vesperp4/mono/compare/tv-web-v0.3.0...tv-web-v0.3.1) (2026-07-09)
+
+
+### Bug Fixes
+
+* **tv:** query Sanity via apicdn with cache, timeout, and stale fallback ([#214](https://github.com/vesperp4/mono/issues/214)) ([5f3453b](https://github.com/vesperp4/mono/commit/5f3453b7d248bd7ac2cec777eb6585f49589a6d0))
+
 ## [0.3.0](https://github.com/vesperp4/mono/compare/tv-web-v0.2.0...tv-web-v0.3.0) (2026-07-02)
 
 
