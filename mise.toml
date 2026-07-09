@@ -19,9 +19,10 @@ pipx = "1.12.0"
 # deploys live in the separate infra repo; see docs/entra-identity.md for Entra).
 "azure" = "2.86.0"  # Azure CLI (`az`), installed via pipx
 
-# Rust toolchain for the API service (apps/portal/api also pins via
-# rust-toolchain.toml; rustup honors that when entering the crate).
-rust = "1.93.1"
+# Rust toolchain for the API service. Keep in sync with
+# apps/portal/api/rust-toolchain.toml: rustup honors that pin inside the crate,
+# but the cargo: tools below build at repo root with this version.
+rust = "1.94.0"
 
 # CI quality/security tooling — mirrors the GitHub Actions gates so they can be
 # reproduced locally.
@@ -33,7 +34,11 @@ cosign = "latest"
 # Rust CI helpers (cargo-installed binaries).
 "cargo:cargo-deny" = "latest"
 "cargo:cargo-llvm-cov" = "latest"
-"cargo:sqlx-cli" = "latest"
+# Pinned to the sqlx minor in apps/portal/api/Cargo.toml (`cargo sqlx prepare`
+# metadata is version-coupled, so the CLI must not drift ahead of the crate).
+# Default features pull in native-tls/openssl-sys, which needs pkg-config +
+# libssl-dev the devcontainer image doesn't have; rustls matches the crate.
+"cargo:sqlx-cli" = { version = "0.9.0", default-features = false, features = "rustls,postgres" }
 
 [settings]
 # Required for [hooks] below.
@@ -91,7 +96,7 @@ description = "Check formatting without writing (mirrors ci.yml)"
 run = "pnpm turbo format-check"
 
 [tasks.audit]
-description = "Audit production dependencies for CVEs (mirrors ci.yml)"
+description = "Audit production dependencies for CVEs (mirrors npm-audit.yaml, the scheduled scan; kept in `check` as a pre-push heads-up, not a CI gate)"
 run = "pnpm audit --prod"
 
 [tasks.check-mainsite-web]
