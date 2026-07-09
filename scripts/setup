@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-/usr/local/bin/mise trust ./mise.toml
+/usr/local/bin/mise trust /workspaces/"${DEVPOD_WORKSPACE_ID:?DEVPOD_WORKSPACE_ID must be set}"/mise.toml
 /usr/local/bin/mise install
