@@ -25,14 +25,17 @@ pipx = "1.12.0"
 rust = "1.94.0"
 
 # CI quality/security tooling — mirrors the GitHub Actions gates so they can be
-# reproduced locally.
-actionlint = "latest"
-shellcheck = "latest"
-trivy = "latest"
+# reproduced locally. Gate tools (whose verdicts define pass/fail) are pinned
+# to a minor so a fresh environment agrees with yesterday's; dependabot does
+# not manage mise.toml, so review these when bumping the corresponding
+# workflow pins. Convenience tools stay on latest.
+actionlint = "1.7"
+shellcheck = "0.11"
+trivy = "0.72"
 cosign = "latest"
 
 # Rust CI helpers (cargo-installed binaries).
-"cargo:cargo-deny" = "latest"
+"cargo:cargo-deny" = "0.19"
 "cargo:cargo-llvm-cov" = "latest"
 # Pinned to the sqlx minor in apps/portal/api/Cargo.toml (`cargo sqlx prepare`
 # metadata is version-coupled, so the CLI must not drift ahead of the crate).
@@ -79,6 +82,10 @@ run = "pnpm turbo build"
 description = "Auto-format the codebase (Prettier)"
 run = "pnpm turbo format --continue"
 
+[tasks.test]
+description = "Run every JS test suite"
+run = "pnpm turbo test"
+
 # --- Local database (for the API + integration tests) ----------------------
 
 [tasks.db-up]
@@ -99,6 +106,10 @@ run = "pnpm turbo format-check"
 description = "Audit production dependencies for CVEs (mirrors npm-audit.yaml, the scheduled scan; kept in `check` as a pre-push heads-up, not a CI gate)"
 run = "pnpm audit --prod"
 
+[tasks.check-web]
+description = "Full JS gate: lint, typecheck, test, build across the workspace (mirrors ci.yml plus every *-test.yaml)"
+run = "pnpm turbo lint typecheck test build"
+
 [tasks.check-mainsite-web]
 description = "mainsite-web gate: lint, typecheck, test, build (mirrors mainsite-web-test.yaml)"
 run = "pnpm turbo lint typecheck test build --filter=mainsite-web"
@@ -107,6 +118,14 @@ run = "pnpm turbo lint typecheck test build --filter=mainsite-web"
 description = "portal-web gate: lint, typecheck, test, build (mirrors portal-web-test.yaml)"
 run = "pnpm turbo lint typecheck test build --filter=portal-web"
 
+[tasks.check-tv-web]
+description = "tv-web gate: lint, typecheck, test, build (mirrors tv-web-test.yaml)"
+run = "pnpm turbo lint typecheck test build --filter=tv-web"
+
+[tasks.check-tv-engine]
+description = "tv-engine gate: lint, typecheck, test, build (mirrors tv-engine-test.yaml)"
+run = "pnpm turbo lint typecheck test build --filter=tv-engine"
+
 [tasks.check-portal-api]
 description = "API gate: fmt, clippy, deny (bans/licenses/sources), coverage (mirrors _rust-service-test.yaml). Needs `mise run db-up`."
 dir = "apps/portal/api"
@@ -114,6 +133,10 @@ shell = "bash -c"
 env = { DATABASE_URL = "postgres://postgres:postgres@localhost:5432/vesperp4" }
 run = """
 set -euo pipefail
+if ! (exec 3<>/dev/tcp/localhost/5432) 2>/dev/null; then
+  echo "Postgres is not reachable on localhost:5432 - run: mise run db-up" >&2
+  exit 1
+fi
 cargo fmt --all --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo deny check bans licenses sources
@@ -130,11 +153,12 @@ description = "Lint GitHub Actions workflows with actionlint"
 run = "actionlint"
 
 [tasks.lint-scripts]
-description = "Lint shell scripts with shellcheck"
-run = "shellcheck scripts/ci/*.sh scripts/setup scripts/setup_project"
+description = "Lint every shell script under scripts/ with shellcheck (found by shebang, so new scripts are covered automatically)"
+shell = "bash -c"
+run = "grep -rlE '^#!/(usr/)?bin/(env )?(ba)?sh' scripts | xargs -r shellcheck"
 
 # --- The aggregate: run this before pushing --------------------------------
 
 [tasks.check]
 description = "Run every local gate (mirrors CI). Run before pushing."
-depends = ["lint-workflows", "lint-scripts", "audit", "format-check", "check-mainsite-web", "check-portal-web", "check-portal-api"]
+depends = ["lint-workflows", "lint-scripts", "audit", "format-check", "check-web", "check-portal-api"]
