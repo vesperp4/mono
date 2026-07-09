@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.2...tv-engine-v0.2.3) (2026-07-09)
+
+
+### Bug Fixes
+
+* **tv:** query Sanity via apicdn with cache, timeout, and stale fallback ([#214](https://github.com/vesperp4/mono/issues/214)) ([5f3453b](https://github.com/vesperp4/mono/commit/5f3453b7d248bd7ac2cec777eb6585f49589a6d0))
+
 ## [0.2.2](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.1...tv-engine-v0.2.2) (2026-07-02)
 
 
