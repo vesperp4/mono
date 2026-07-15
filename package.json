@@ -10,8 +10,8 @@
     "format-check": "turbo format-check"
   },
   "devDependencies": {
-    "prettier": "^3.9.4",
-    "turbo": "^2.10.4",
+    "prettier": "^3.9.5",
+    "turbo": "^2.10.5",
     "typescript": "^6.0.3"
   },
   "pnpm": {
