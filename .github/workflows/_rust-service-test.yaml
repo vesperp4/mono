@@ -47,7 +47,7 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/vesperp4
       CARGO_TERM_COLOR: always
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # rust-toolchain.toml in the crate pins the version + rustfmt/clippy components;
       # rustup auto-installs it on first invocation.
@@ -58,7 +58,7 @@ jobs:
         with:
           workspaces: ${{ inputs.working-directory }}
 
-      - uses: taiki-e/install-action@43aecc8d72668fbcfe75c31400bc4f890f1c5853 # v2.83.2
+      - uses: taiki-e/install-action@c44f6b046f1c29ae5918b1e0bfdbb2f1813836fd # v2.84.1
         with:
           tool: cargo-llvm-cov,cargo-deny
 
