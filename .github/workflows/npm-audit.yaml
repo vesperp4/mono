@@ -40,24 +40,75 @@ jobs:
         with:
           node-version: 22
 
+      # `pnpm audit` exits 1 both when it finds advisories and when it fails to
+      # run at all (a registry hiccup once crashed it for four days straight,
+      # during which the tracking issue kept claiming advisories were found
+      # while the real count silently grew from 2 to 20). Classify on whether
+      # the JSON parsed, not on the exit code, so the two are never conflated.
       - name: Audit production dependencies
-        run: pnpm audit --prod
+        id: audit
+        run: |
+          set +e
+          pnpm audit --prod --json >audit.json 2>audit.err
+          set -e
+
+          if ! jq -e 'has("advisories")' audit.json >/dev/null 2>&1; then
+            echo "outcome=tool-failure" >>"$GITHUB_OUTPUT"
+            echo "::error::pnpm audit did not return parseable JSON; advisory status is unknown"
+            head -c 4000 audit.err
+            exit 1
+          fi
+
+          jq -r '
+            .advisories | to_entries | map(.value)
+            | sort_by(.severity)
+            | .[]
+            | "- **\(.module_name)** (\(.severity)): installed \([.findings[].version] | unique | join(", ")), patched \(.patched_versions) (\(.github_advisory_id))"
+          ' audit.json >summary.md
+
+          count=$(jq '.advisories | length' audit.json)
+          echo "outcome=advisories" >>"$GITHUB_OUTPUT"
+          echo "count=$count" >>"$GITHUB_OUTPUT"
+
+          if [ "$count" -eq 0 ]; then
+            echo "No known vulnerabilities in production dependencies."
+            exit 0
+          fi
+
+          cat summary.md
+          exit 1
 
       - name: Open or update tracking issue
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          OUTCOME: ${{ steps.audit.outputs.outcome }}
+          COUNT: ${{ steps.audit.outputs.count }}
         run: |
-          title="npm: dependency audit failing"
-          body="The scheduled npm audit found one or more advisories affecting production dependencies.
+          if [ "$OUTCOME" = "advisories" ]; then
+            title="npm: dependency audit failing"
+            body="The scheduled npm audit found $COUNT advisory/advisories affecting production dependencies.
+
+          $(cat summary.md)
 
           Failing run: $RUN_URL
 
           Triage options:
           - Upgrade the affected dependency (or wait for the Dependabot security PR).
-          - For a vulnerable transitive dependency with a patched release, add a version-floor entry to \`pnpm.overrides\` in the root \`package.json\`.
+          - For a vulnerable transitive dependency with a patched release, add a version-floor entry to \`pnpm.overrides\` in the root \`package.json\`. Bound the floor to the affected major: an unbounded floor can resolve straight into a newer vulnerable major, and pnpm does not re-check an override's result against the other entries.
           - If no fix exists upstream, the fix is usually bumping the direct dependency that pulls it in."
+          else
+            title="npm: dependency audit could not run"
+            body="The scheduled npm audit **failed to execute**, so the advisory status of production dependencies is currently unknown. This is a tooling failure, not a finding: do not read it as either a clean or a failing audit.
+
+          Failing run: $RUN_URL
+
+          Triage options:
+          - Re-run the workflow; registry-side failures are usually transient.
+          - If it keeps failing, run \`mise run audit\` locally to get the real advisory list."
+          fi
+
           number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
           if [ -n "$number" ]; then
             gh issue comment "$number" --body "$body"
