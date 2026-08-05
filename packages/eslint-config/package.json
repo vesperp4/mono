@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.2.11",
+    "eslint-config-next": "^16.2.12",
     "typescript-eslint": "^8.65.0"
   },
   "devDependencies": {
