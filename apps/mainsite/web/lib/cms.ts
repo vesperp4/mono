@@ -136,7 +136,7 @@ export async function getPostSlugs(): Promise<string[]> {
   const slugs = await groq<string[]>(
     `*[_type == "post" && defined(slug.current) && publishedAt <= now()].slug.current`,
   );
-  return slugs ?? [];
+  return slugs && slugs.length > 0 ? slugs : ["placeholder"];
 }
 
 /** Events that have not ended yet, soonest first. */
