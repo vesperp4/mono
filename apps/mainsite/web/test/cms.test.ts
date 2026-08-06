@@ -25,7 +25,7 @@ describe('cms', () => {
 
     expect(await cms.getPosts()).toEqual([])
     expect(await cms.getPost('some-post')).toBeNull()
-    expect(await cms.getPostSlugs()).toEqual([])
+    expect(await cms.getPostSlugs()).toEqual(['placeholder'])
     expect(await cms.getUpcomingEvents()).toEqual([])
     expect(await cms.getPastEvents()).toEqual([])
     expect(await cms.getTeamMembers()).toEqual([])
