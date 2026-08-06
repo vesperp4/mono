@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/vesperp4/mono/compare/mainsite-web-v0.4.0...mainsite-web-v0.4.1) (2026-08-06)
+
+
+### Bug Fixes
+
+* **mainsite:** copy public assets to static export output ([#240](https://github.com/vesperp4/mono/issues/240)) ([decacb2](https://github.com/vesperp4/mono/commit/decacb21d5f2136cd21c4c3205fb930ea1535cf3))
+
 ## [0.4.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.3.0...mainsite-web-v0.4.0) (2026-07-03)
 
 
