@@ -1,0 +1,12 @@
+{
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'"
+  },
+  "navigationFallback": {
+    "rewrite": "/404.html",
+    "exclude": ["/images/*.{png,jpg,gif,svg,webp}", "/videos/*.{mp4}", "/*.{css,js,ico}"]
+  }
+}
