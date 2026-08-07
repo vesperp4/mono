@@ -61,6 +61,10 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
           TURBO_CACHE_DIR: .turbo
+          # Sanity content is fetched at build time, so it is invisible to Turbo's
+          # input hash. Without this, a content publish is a guaranteed cache hit
+          # that replays a stale out/ and redeploys the previous site unchanged.
+          TURBO_FORCE: ${{ github.event_name != 'push' }}
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
