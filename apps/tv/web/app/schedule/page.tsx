@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getUpcomingSlots } from "@/lib/schedule";
 
-export const revalidate = 300;
+// See app/page.tsx: ISR routes 500 on Static Web Apps, so render per request.
+export const dynamic = "force-dynamic";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   weekday: "short",

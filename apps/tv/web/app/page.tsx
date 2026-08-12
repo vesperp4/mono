@@ -8,7 +8,11 @@ const CHANNEL_HLS_URL =
   process.env.NEXT_PUBLIC_CHANNEL_HLS_URL ??
   "http://localhost:8000/channels/vesperp4/master.m3u8";
 
-export const revalidate = 60;
+// Rendered per request, not via ISR: Azure Static Web Apps' hybrid Next.js
+// runtime 500s on routes that carry a `revalidate` window, and "now playing" is
+// time-dependent anyway. Sanity request volume is bounded by the TTL cache in
+// lib/schedule.ts instead.
+export const dynamic = "force-dynamic";
 
 export default async function WatchPage() {
   const onAir = await getOnAirSlot();
