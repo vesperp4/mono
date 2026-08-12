@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.1...mainsite-web-v0.5.2) (2026-08-12)
+
+
+### Bug Fixes
+
+* **mainsite:** use info@vesperp4.com as the chapter contact email ([#258](https://github.com/vesperp4/mono/issues/258)) ([d5a0816](https://github.com/vesperp4/mono/commit/d5a08166e2f6928ed767dc66f8e0c8eae6dc2f9b))
+
 ## [0.5.1](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.0...mainsite-web-v0.5.1) (2026-08-07)
 
 
