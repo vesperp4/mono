@@ -4,7 +4,7 @@
 /** Signup lives on the portal app (portal.vesperp4.com), not the mainsite. */
 export const PORTAL_SIGNUP_URL = "https://portal.vesperp4.com/signup";
 
-export const CHAPTER_EMAIL = "vesperp4@pupr.edu";
+export const CHAPTER_EMAIL = "info@vesperp4.com";
 
 // Social profiles are not public yet — the hrefs stay "#" placeholders until
 // the chapter publishes them. Keep rendering the icons so the layout is ready.
