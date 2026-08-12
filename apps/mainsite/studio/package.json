@@ -11,12 +11,12 @@
   "dependencies": {
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "sanity": "^6.8.0",
-    "styled-components": "^6.4.4"
+    "sanity": "^6.9.1",
+    "styled-components": "^6.5.1"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "typescript": "^6.0.3"
   }
