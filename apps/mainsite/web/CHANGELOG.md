@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.0...mainsite-web-v0.5.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* **mainsite:** allow Sanity CDN images in the CSP ([#255](https://github.com/vesperp4/mono/issues/255)) ([edb78d2](https://github.com/vesperp4/mono/commit/edb78d2ae112542237d159807a0b638cd6b8a7da))
+
 ## [0.5.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.4.1...mainsite-web-v0.5.0) (2026-08-06)
 
 
