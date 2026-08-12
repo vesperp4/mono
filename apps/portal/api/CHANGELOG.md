@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/vesperp4/mono/compare/portal-api-v0.8.3...portal-api-v0.9.0) (2026-08-12)
+
+
+### Miscellaneous
+
+* Version bump only; no changes to this app. An empty commit ([#246](https://github.com/vesperp4/mono/issues/246)) touched no files, so release-please attributed it to every component.
+
 ## [0.8.3](https://github.com/vesperp4/mono/compare/portal-api-v0.8.2...portal-api-v0.8.3) (2026-07-03)
 
 
