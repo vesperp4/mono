@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.3...tv-engine-v0.3.0) (2026-08-12)
+
+
+### Miscellaneous
+
+* Version bump only; no changes to this app. An empty commit ([#246](https://github.com/vesperp4/mono/issues/246)) touched no files, so release-please attributed it to every component.
+
 ## [0.2.3](https://github.com/vesperp4/mono/compare/tv-engine-v0.2.2...tv-engine-v0.2.3) (2026-07-09)
 
 
