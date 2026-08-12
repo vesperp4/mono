@@ -3,9 +3,9 @@
 ## [0.4.0](https://github.com/vesperp4/mono/compare/tv-web-v0.3.1...tv-web-v0.4.0) (2026-08-12)
 
 
-### Features
+### Miscellaneous
 
-* **mainsite:** add missing media assets ([#246](https://github.com/vesperp4/mono/issues/246)) ([6116680](https://github.com/vesperp4/mono/commit/6116680daea4386208943168257e13768614d112))
+* Version bump only; no changes to this app. An empty commit ([#246](https://github.com/vesperp4/mono/issues/246)) touched no files, so release-please attributed it to every component.
 
 ## [0.3.1](https://github.com/vesperp4/mono/compare/tv-web-v0.3.0...tv-web-v0.3.1) (2026-07-09)
 
