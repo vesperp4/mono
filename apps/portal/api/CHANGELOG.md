@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/vesperp4/mono/compare/portal-api-v0.8.3...portal-api-v0.9.0) (2026-08-12)
+
+
+### Features
+
+* **mainsite:** add missing media assets ([#246](https://github.com/vesperp4/mono/issues/246)) ([6116680](https://github.com/vesperp4/mono/commit/6116680daea4386208943168257e13768614d112))
+
 ## [0.8.3](https://github.com/vesperp4/mono/compare/portal-api-v0.8.2...portal-api-v0.8.3) (2026-07-03)
 
 
