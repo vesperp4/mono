@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/vesperp4/mono/compare/portal-web-v0.4.1...portal-web-v0.5.0) (2026-08-12)
+
+
+### Features
+
+* **mainsite:** add missing media assets ([#246](https://github.com/vesperp4/mono/issues/246)) ([6116680](https://github.com/vesperp4/mono/commit/6116680daea4386208943168257e13768614d112))
+
 ## [0.4.1](https://github.com/vesperp4/mono/compare/portal-web-v0.4.0...portal-web-v0.4.1) (2026-07-03)
 
 
