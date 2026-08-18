@@ -1,18 +1,20 @@
-# Code ownership
-# Add yourself here as a maintainer
+# CODEOWNERS is last-match-wins, not additive: only the last matching pattern
+# requests review, so `*` is overridden wherever a specific rule applies.
 
-# Default owner for everything
-* @vesperp4/tech-lead
+*                            @vesperp4/leads
 
-# CI/CD
-/.github/ @vesperp4/tech-lead
+/.github/                    @vesperp4/platform
+/turbo.json                  @vesperp4/platform
+/release-please-config.json  @vesperp4/platform
+/mise.toml                   @vesperp4/platform
 
-# Infrastructure
-/infra/ @vesperp4/tech-lead
+/apps/mainsite/web/          @vesperp4/frontend
+/apps/mainsite/studio/       @vesperp4/frontend
+/apps/portal/web/            @vesperp4/frontend
+/apps/tv/web/                @vesperp4/frontend
+/apps/tv/studio/             @vesperp4/frontend
+/packages/                   @vesperp4/frontend
 
-# Website app
-/apps/mainsite/ @vesperp4/tech-lead
-
-# Shared packages
-/packages/eslint-config/ @vesperp4/tech-lead
-/packages/tsconfig/ @vesperp4/tech-lead
+/apps/portal/api/            @vesperp4/backend
+/apps/tv/engine/             @vesperp4/backend
+/apps/tv/packager/           @vesperp4/backend
