@@ -212,6 +212,24 @@ git checkout -b feat/your-feature-name
 
 ---
 
+## Code Ownership
+
+Reviews are routed automatically by [`.github/CODEOWNERS`](.github/CODEOWNERS). Opening a PR
+requests review from the team that owns the paths you touched:
+
+| Team | Owns |
+| ---- | ---- |
+| `@vesperp4/frontend` | Next.js web apps and Sanity studios, shared packages |
+| `@vesperp4/backend` | Portal API (Rust), tv engine and packager |
+| `@vesperp4/platform` | CI/CD workflows, build orchestration, release automation |
+| `@vesperp4/leads` | Everything else, plus repo settings and secrets |
+
+Note that CODEOWNERS is last-match-wins rather than additive: only the most specific matching
+rule requests review, so a PR touching only `apps/portal/api/` goes to `@vesperp4/backend`
+alone, not to `@vesperp4/leads` as well.
+
+---
+
 ## Commit Messages
 
 This repo enforces [Conventional Commits](https://www.conventionalcommits.org/). The commit-msg hook will reject messages that don't follow the format.
@@ -246,7 +264,7 @@ docs: add setup instructions to CONTRIBUTING
 
 - **TypeScript strict mode** — no `any`, no unused variables
 - **ESLint** — run `mise run check` before pushing; CI will catch violations
-- **No direct pushes** to `dev` or `main` — always use a PR
+- **No direct pushes** to `main` — always use a PR
 
 ---
 
@@ -269,13 +287,13 @@ failures before pushing.
 
 ## Quarterly Handoff Protocol
 
-At the end of each quarter, the outgoing Tech Lead must:
+At the end of each quarter, the outgoing lead (`@vesperp4/leads`) must:
 
 1. **Update maintainers table** in `README.md` with incoming leads
 2. **Document any in-progress work** — open GitHub issues for anything unfinished
 3. **Rotate secrets** — update `AZURE_STATIC_WEB_APPS_API_TOKEN` in GitHub secrets if needed
 4. **Tag the release** — create a `v<year>.<quarter>` tag on `main` (e.g. `v2025.Q1`)
-5. **Handoff meeting** — walk the incoming Tech Lead through the codebase and open issues
+5. **Handoff meeting** — walk the incoming lead through the codebase and open issues
 
 ```bash
 # Tagging a release

@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a change or addition
+labels: ['enhancement']
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - mainsite
+        - portal
+        - tv
+        - repo-wide
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
