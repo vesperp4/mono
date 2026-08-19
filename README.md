@@ -109,7 +109,7 @@ feat/* or fix/*  →  PR to main  →  production
 
 - Trunk-based: branch off `main`, open a PR back to `main`
 - CI must pass (lint, typecheck, build) before merge
-- 1 approval required on all PRs
+- 1 approval required on all PRs, routed by [`CODEOWNERS`](./.github/CODEOWNERS)
 - Web apps deploy straight from `main`; `portal-api`, `tv-engine`, and `tv-packager`
   release via release-please — merging a release PR builds and signs the container
   image, deploys to dev automatically, and prod promotion is approval-gated
@@ -141,8 +141,21 @@ itself has no login.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) — includes setup, branch workflow,
-code standards, and the quarterly handoff protocol.
+New here? Start with [docs/onboarding.md](./docs/onboarding.md): it assumes no prior
+experience with this kind of project and takes you from a fresh machine to your first
+merged pull request.
+
+| Guide | For |
+| ----- | --- |
+| [docs/onboarding.md](./docs/onboarding.md) | Your first week: setup, the tools, your first change |
+| [docs/team-guide.md](./docs/team-guide.md) | How the team works: picking up issues, review, getting unstuck |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Reference: branches, commits, CI checks, code ownership |
+| [docs/maintaining.md](./docs/maintaining.md) | Running the project, for the current lead |
+| [docs/glossary.md](./docs/glossary.md) | Plain-English definitions of every term here |
+
+Good places to start are the open
+[`good first issue`](https://github.com/vesperp4/mono/labels/good%20first%20issue)
+tickets.
 
 ---
 
@@ -150,11 +163,21 @@ code standards, and the quarterly handoff protocol.
 
 | Role            | Name | GitHub |
 | --------------- | ---- | ------ |
-| Tech Lead       | —    | —      |
-| Design Lead     | —    | —      |
-| Faculty Advisor | —    | —      |
+| Lead            | Ramon Collazo | [@RamonCollazo](https://github.com/RamonCollazo) |
+| Design Lead     |      |        |
+| Faculty Advisor |      |        |
 
 _Update this table each quarter._
+
+---
+
+## Contributors
+
+Everyone who has shipped something here. Add yourself in your first pull request.
+
+| Name | GitHub | Since |
+| ---- | ------ | ----- |
+| Ramon Collazo | [@RamonCollazo](https://github.com/RamonCollazo) | 2026 |
 
 ---
 
