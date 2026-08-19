@@ -219,14 +219,17 @@ requests review from the team that owns the paths you touched:
 
 | Team | Owns |
 | ---- | ---- |
-| `@vesperp4/frontend` | Next.js web apps and Sanity studios, shared packages |
-| `@vesperp4/backend` | Portal API (Rust), tv engine and packager |
+| `@vesperp4/fullstack` | Everything under `apps/` and `packages/`: web apps, Sanity studios, portal API, tv engine and packager |
 | `@vesperp4/platform` | CI/CD workflows, build orchestration, release automation |
 | `@vesperp4/leads` | Everything else, plus repo settings and secrets |
 
+Contributors work across the stack rather than in a frontend or backend lane, so one team owns
+all application code. Reach for a narrower team only if a distinct group of people ever owns a
+distinct set of paths; splitting teams that share the same members just adds noise.
+
 Note that CODEOWNERS is last-match-wins rather than additive: only the most specific matching
-rule requests review, so a PR touching only `apps/portal/api/` goes to `@vesperp4/backend`
-alone, not to `@vesperp4/leads` as well.
+rule requests review, so a PR touching only `.github/` goes to `@vesperp4/platform` alone, not
+to `@vesperp4/leads` as well.
 
 ---
 

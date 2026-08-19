@@ -8,13 +8,5 @@
 /release-please-config.json  @vesperp4/platform
 /mise.toml                   @vesperp4/platform
 
-/apps/mainsite/web/          @vesperp4/frontend
-/apps/mainsite/studio/       @vesperp4/frontend
-/apps/portal/web/            @vesperp4/frontend
-/apps/tv/web/                @vesperp4/frontend
-/apps/tv/studio/             @vesperp4/frontend
-/packages/                   @vesperp4/frontend
-
-/apps/portal/api/            @vesperp4/backend
-/apps/tv/engine/             @vesperp4/backend
-/apps/tv/packager/           @vesperp4/backend
+/apps/                       @vesperp4/fullstack
+/packages/                   @vesperp4/fullstack
