@@ -131,7 +131,7 @@ export default function Footer() {
               {/* Logo + wordmark */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 relative shrink-0">
-                  <Image src="/logo.png" alt="VESPER P4 Logo" fill className="object-contain" />
+                  <Image src="/logo.webp" alt="VESPER P4 Logo" fill className="object-contain" />
                 </div>
                 <span className="text-sm font-semibold tracking-widest uppercase text-zinc-900">
                   VESPER P4
@@ -187,6 +187,8 @@ export default function Footer() {
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={social.label}
                     className="w-9 h-9 border border-gray-300 flex items-center justify-center text-gray-700 hover:border-gray-500 hover:text-gray-900 transition-all duration-200"
                   >

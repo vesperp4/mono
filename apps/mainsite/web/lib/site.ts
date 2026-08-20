@@ -6,11 +6,11 @@ export const PORTAL_SIGNUP_URL = "https://portal.vesperp4.com/signup";
 
 export const CHAPTER_EMAIL = "info@vesperp4.com";
 
-// Social profiles are not public yet — the hrefs stay "#" placeholders until
-// the chapter publishes them. Keep rendering the icons so the layout is ready.
+// Discord invite is not public yet — the href stays a "#" placeholder until
+// the chapter publishes it. Keep rendering the icon so the layout is ready.
 export const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "#" },
-  { label: "GitHub", href: "#" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/vesperp4" },
+  { label: "GitHub", href: "https://github.com/vesperp4" },
   { label: "Discord", href: "#" },
 ] as const;
 
