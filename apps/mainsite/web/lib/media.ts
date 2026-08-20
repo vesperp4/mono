@@ -1,7 +1,7 @@
 // Centralized media configuration — update paths here to swap assets globally
 
 export const MEDIA = {
-  logo: "/logo.png",
+  logo: "/logo.webp",
   stars: "/stars.png",
   images: {
     ai: "/Fondo de AI eliminado.png",

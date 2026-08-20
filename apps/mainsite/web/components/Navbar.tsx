@@ -56,13 +56,13 @@ export default function Navbar() {
               className="object-contain"
             />
           </div>
-          <span
-            className={`text-sm font-semibold tracking-widest uppercase transition-colors duration-300 ${
-              scrolled ? "text-zinc-900" : "text-white"
-            }`}
-          >
-            VESPER P4
-          </span>
+          <Image
+            src={scrolled ? "/vesper-logo-letters-black.svg" : "/vesper-logo-letters-white.svg"}
+            alt="VESPER P4"
+            width={110}
+            height={15}
+            className="transition-opacity duration-300"
+          />
         </Link>
 
         {/* Desktop nav — lg breakpoint (6 links don't fit at md) */}
