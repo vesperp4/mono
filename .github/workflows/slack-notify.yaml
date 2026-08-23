@@ -1,0 +1,135 @@
+name: Slack Notify
+
+# One watcher for every workflow worth hearing about, instead of a notify step
+# bolted onto 23 files. `workflow_run` fires after another workflow completes,
+# and the `branches` filter keeps it to main-branch runs, so PR failures stay in
+# the PR where they are already visible and never reach Slack.
+#
+# Adding a workflow to the watch list is the only edit needed to cover it. Note
+# that `workflow_run` only ever runs the copy of this file on the default
+# branch, so changes here take effect once merged, not on the PR that makes them.
+on:
+  workflow_run:
+    workflows:
+      - CI
+      - mainsite-web Deploy
+      - portal-web Deploy
+      - tv-web Deploy
+      - Portal API Build
+      - Portal API Promote Prod
+      - TV Engine Build
+      - TV Packager Build
+      - Release Please
+      - CodeQL
+      - npm Audit
+      - Secret Scan
+      - OpenSSF Scorecard
+      - Portal API Security Scan
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  notify:
+    name: Post to Slack
+    runs-on: ubuntu-latest
+
+    # `cancelled` and `skipped` are almost always someone superseding a run, not
+    # an incident. Successes are announced only for the workflows that change
+    # what is deployed; everything else succeeding is not news.
+    if: >-
+      github.event.workflow_run.conclusion == 'failure'
+      || github.event.workflow_run.conclusion == 'timed_out'
+      || github.event.workflow_run.conclusion == 'startup_failure'
+      || (github.event.workflow_run.conclusion == 'success'
+          && contains(fromJSON('["mainsite-web Deploy","portal-web Deploy","tv-web Deploy","Portal API Promote Prod","Release Please"]'),
+                      github.event.workflow_run.name))
+
+    steps:
+      - name: Post to Slack
+        # Every value from the event goes through env, never through `${{ }}`
+        # inside the script: a branch or commit subject is attacker-controlled
+        # text and direct interpolation would splice it into the shell.
+        env:
+          SLACK_WEBHOOK_ALERTS: ${{ secrets.SLACK_WEBHOOK_ALERTS }}
+          SLACK_WEBHOOK_DEPLOYS: ${{ secrets.SLACK_WEBHOOK_DEPLOYS }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ "$CONCLUSION" = "success" ]; then
+            emoji=":white_check_mark:"
+            color="#2eb886"
+            title="${WORKFLOW_NAME} succeeded"
+            webhook="${SLACK_WEBHOOK_DEPLOYS:-}"
+          else
+            emoji=":rotating_light:"
+            color="#d7263d"
+            title="${WORKFLOW_NAME} ${CONCLUSION} on ${HEAD_BRANCH}"
+            webhook=""
+          fi
+
+          # Deploy announcements fall back to the alerts channel when no
+          # separate deploys webhook is configured, so a half-finished setup
+          # still delivers rather than silently dropping messages.
+          if [ -z "$webhook" ]; then
+            webhook="${SLACK_WEBHOOK_ALERTS:-}"
+          fi
+
+          if [ -z "$webhook" ]; then
+            echo "::warning::No Slack webhook secret configured; nothing sent."
+            exit 0
+          fi
+
+          subject="$(printf '%s' "$COMMIT_MESSAGE" | head -n 1)"
+          short_sha="${HEAD_SHA:0:7}"
+
+          payload="$(jq -n \
+            --arg title "$title" \
+            --arg emoji "$emoji" \
+            --arg color "$color" \
+            --arg branch "$HEAD_BRANCH" \
+            --arg actor "$ACTOR" \
+            --arg subject "$subject" \
+            --arg short_sha "$short_sha" \
+            --arg run_url "$RUN_URL" \
+            --arg commit_url "https://github.com/${REPO}/commit/${HEAD_SHA}" \
+            --arg run_number "$RUN_NUMBER" \
+            '{
+              text: $title,
+              attachments: [{
+                color: $color,
+                blocks: [
+                  {type: "header",
+                   text: {type: "plain_text", text: ($emoji + " " + $title), emoji: true}},
+                  {type: "section",
+                   text: {type: "mrkdwn", text: ("<" + $commit_url + "|`" + $short_sha + "`> " + $subject)}},
+                  {type: "section",
+                   fields: [
+                     {type: "mrkdwn", text: ("*Branch*\n" + $branch)},
+                     {type: "mrkdwn", text: ("*Triggered by*\n" + $actor)}
+                   ]},
+                  {type: "actions",
+                   elements: [{type: "button",
+                               text: {type: "plain_text", text: "View run", emoji: true},
+                               url: $run_url}]},
+                  {type: "context",
+                   elements: [{type: "mrkdwn", text: ("run #" + $run_number)}]}
+                ]
+              }]
+            }')"
+
+          curl --silent --show-error --fail-with-body \
+            --request POST \
+            --header 'content-type: application/json' \
+            --data "$payload" \
+            "$webhook"

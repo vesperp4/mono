@@ -1,0 +1,2 @@
+SLACK_WEBHOOK_ALERTS=https://hooks.slack.com/services/T000/B000/xxxx
+RELAY_TOKEN=generate-with-openssl-rand-hex-32
