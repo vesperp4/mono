@@ -13,12 +13,12 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260823.1",
+    "@cloudflare/workers-types": "^5.20260830.1",
     "@repo/tsconfig": "workspace:*",
     "eslint": "^9.39.5",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11",
-    "wrangler": "^4.125.0"
+    "wrangler": "^4.127.1"
   }
 }
