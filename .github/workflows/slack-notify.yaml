@@ -90,7 +90,10 @@ jobs:
             exit 0
           fi
 
-          subject="$(printf '%s' "$COMMIT_MESSAGE" | head -n 1)"
+          # First line only, via parameter expansion rather than a pipe: with
+          # `pipefail`, a long body (Dependabot writes tens of KB) makes `head`
+          # close the pipe before `printf` finishes, and EPIPE fails the step.
+          subject="${COMMIT_MESSAGE%%$'\n'*}"
           short_sha="${HEAD_SHA:0:7}"
 
           payload="$(jq -n \
