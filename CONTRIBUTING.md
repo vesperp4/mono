@@ -1,6 +1,12 @@
 # Contributing to Vesper P4 Website
 
-This guide covers everything you need to contribute to the Vesper P4 website — from first-time setup to quarterly handoff.
+This guide covers everything you need to contribute to the Vesper P4 website: first-time
+setup through to quarterly handoff.
+
+If this is your first project of this kind, read [docs/onboarding.md](./docs/onboarding.md)
+first; it explains the same ground assuming no prior experience. For how the team itself
+operates (claiming issues, review expectations, what to do when you are stuck), see
+[docs/team-guide.md](./docs/team-guide.md).
 
 ---
 
@@ -194,7 +200,9 @@ feat/* or fix/*  →  PR to main  →  production
 
 - Trunk-based: branch off `main`, open a PR back to `main`
 - Use conventional commit prefixes for branch names: `feat/`, `fix/`, `chore/`, `docs/`
-- 1 approval required before merging any PR
+- 1 approval from a code owner is required before merging any PR. Which team is asked
+  depends on the paths you touched (see [Code Ownership](#code-ownership) below), and a
+  new push dismisses an existing approval.
 
 ### Creating a branch
 
@@ -285,6 +293,11 @@ failures before pushing.
 | Build         | `pnpm turbo build`                          |
 | Dependency audit | `pnpm audit --prod`                      |
 | Commit messages | `cz check` validates all commit messages in the PR |
+
+> **Coverage thresholds are enforced.** `mainsite-web` requires 95% line and 82% branch
+> coverage (`apps/mainsite/web/vitest.config.ts`), so a new component or helper needs a
+> test in the same PR. The failure surfaces as a coverage error rather than an obvious
+> "you forgot a test", so reach for `test/` first when a build that compiles still fails.
 
 ---
 
