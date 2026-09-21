@@ -1,0 +1,115 @@
+name: Uptime Check
+
+# A scheduled black-box probe of the prod surfaces, reporting to Slack.
+#
+# Deliberately shallow: it answers "is the site reachable and does the API say
+# its database is up", nothing more. It cannot see the failure class described in
+# docs/alerting.md (mail that is accepted and never delivered), because those
+# endpoints answer 202 either way. That is what the Azure Monitor rules on the
+# ACS diagnostic logs are for; this catches the crude outages instead.
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: uptime-check
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: Probe prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe and report
+        env:
+          SLACK_WEBHOOK_ALERTS: ${{ secrets.SLACK_WEBHOOK_ALERTS }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -uo pipefail
+
+          # name|url|jq assertion (empty = status code only)
+          targets=(
+            "mainsite|https://vesperp4.com/|"
+            "portal-web|https://portal.vesperp4.com/|"
+            'portal-api|https://api.portal.vesperp4.com/health|.status == "ok" and .database == "up"'
+          )
+
+          # One retry before reporting. A single failed probe from a GitHub
+          # runner is far more often a transient network blip than an outage,
+          # and a channel that cries wolf gets muted.
+          probe() {
+            local url="$1" assertion="$2" body status
+            body="$(curl --silent --show-error --location --max-time 20 \
+                         --write-out '\n%{http_code}' "$url" 2>&1)" || return 1
+            status="$(printf '%s' "$body" | tail -n 1)"
+            body="$(printf '%s' "$body" | sed '$d')"
+
+            [ "$status" = "200" ] || { echo "HTTP $status"; return 1; }
+            [ -n "$assertion" ] || return 0
+
+            if ! printf '%s' "$body" | jq --exit-status "$assertion" >/dev/null 2>&1; then
+              echo "body failed assertion: $(printf '%s' "$body" | head -c 200)"
+              return 1
+            fi
+          }
+
+          failures=""
+          for target in "${targets[@]}"; do
+            name="${target%%|*}"
+            rest="${target#*|}"
+            url="${rest%%|*}"
+            assertion="${rest#*|}"
+
+            if ! reason="$(probe "$url" "$assertion")"; then
+              sleep 20
+              if ! reason="$(probe "$url" "$assertion")"; then
+                echo "FAIL ${name}: ${reason}"
+                failures="${failures}• *${name}* (${url}): ${reason:-unreachable}"$'\n'
+                continue
+              fi
+            fi
+            echo "ok ${name}"
+          done
+
+          if [ -z "$failures" ]; then
+            echo "All prod targets healthy."
+            exit 0
+          fi
+
+          if [ -n "${SLACK_WEBHOOK_ALERTS:-}" ]; then
+            payload="$(jq -n \
+              --arg failures "$failures" \
+              --arg run_url "$RUN_URL" \
+              '{
+                text: "Prod uptime check failed",
+                attachments: [{
+                  color: "#d7263d",
+                  blocks: [
+                    {type: "header",
+                     text: {type: "plain_text", text: ":rotating_light: Prod uptime check failed", emoji: true}},
+                    {type: "section", text: {type: "mrkdwn", text: $failures}},
+                    {type: "actions",
+                     elements: [{type: "button",
+                                 text: {type: "plain_text", text: "View run", emoji: true},
+                                 url: $run_url}]},
+                    {type: "context",
+                     elements: [{type: "mrkdwn", text: "Each target was probed twice, 20s apart."}]}
+                  ]
+                }]
+              }')"
+
+            curl --silent --show-error --fail-with-body \
+              --request POST \
+              --header 'content-type: application/json' \
+              --data "$payload" \
+              "$SLACK_WEBHOOK_ALERTS"
+          else
+            echo "::warning::No SLACK_WEBHOOK_ALERTS secret configured; nothing sent."
+          fi
+
+          # Fail the run too, so the outage is visible in the Actions tab even
+          # if Slack delivery itself is what is broken.
+          exit 1

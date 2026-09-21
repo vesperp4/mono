@@ -1,0 +1,71 @@
+name: Alerts Relay Deploy
+
+# Publishes the Cloudflare Worker that translates Azure Monitor alerts into
+# Slack messages (apps/ops/alerts-relay). Wrangler comes from the lockfile
+# rather than a marketplace action, so the deploy tool is pinned by the same
+# review that pins everything else.
+#
+# The Worker's own secrets (SLACK_WEBHOOK_URL, RELAY_TOKEN) are NOT set here.
+# They are set once with `wrangler secret put` and persist across deploys.
+# See apps/ops/alerts-relay/README.md.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/ops/alerts-relay/**'
+      - '.github/workflows/alerts-relay-deploy.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: alerts-relay-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare
+    runs-on: ubuntu-latest
+    environment: cloudflare
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm --filter alerts-relay test
+
+      # The Worker can equally be deployed by hand from the Cloudflare dashboard
+      # (see the README). While no API token is configured, this workflow must
+      # not turn every push to main red for a deploy nobody asked it to do.
+      - name: Check for credentials
+        id: creds
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN is not set. Skipping deploy; publish from the Cloudflare dashboard, or add the secret to enable CI deploys."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy
+        if: steps.creds.outputs.configured == 'true'
+        run: pnpm --filter alerts-relay exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

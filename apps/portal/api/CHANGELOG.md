@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/vesperp4/mono/compare/portal-api-v0.9.0...portal-api-v0.9.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* **portal-api:** bump yanked chacha20 0.10.0 to 0.10.2 ([#282](https://github.com/vesperp4/mono/issues/282)) ([c90b3fc](https://github.com/vesperp4/mono/commit/c90b3fccb4db594bd6fb4534e3c7db1cf2b0f4db)), closes [#278](https://github.com/vesperp4/mono/issues/278)
+
 ## [0.9.0](https://github.com/vesperp4/mono/compare/portal-api-v0.8.3...portal-api-v0.9.0) (2026-08-12)
 
 
