@@ -85,14 +85,14 @@ describe('Navbar', () => {
     expect(screen.getAllByRole('link', {name: 'About'})).toHaveLength(1)
   })
 
-  it('switches to the solid style once the page is scrolled', () => {
+  it('switches the wordmark image once the page is scrolled', () => {
     render(<Navbar />)
-    const wordmark = screen.getByText('VESPER P4')
-    expect(wordmark).toHaveClass('text-white')
+    const wordmark = screen.getByRole('img', {name: 'VESPER P4'})
+    expect(wordmark.getAttribute('src')).toContain('white')
 
     Object.defineProperty(window, 'scrollY', {value: 100, writable: true})
     fireEvent.scroll(window)
-    expect(wordmark).toHaveClass('text-zinc-900')
+    expect(wordmark.getAttribute('src')).toContain('black')
   })
 
   it('closes the mobile menu when a menu link is clicked', async () => {

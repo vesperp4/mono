@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.3...mainsite-web-v0.6.0) (2026-09-22)
+
+
+### Features
+
+* **mainsite:** add founder photos to Stars & Founders section ([#295](https://github.com/vesperp4/mono/issues/295)) ([2c35ceb](https://github.com/vesperp4/mono/commit/2c35ceb1b463d2522ea171d9b278f397d7430f94))
+
+## [0.5.3](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.2...mainsite-web-v0.5.3) (2026-08-20)
+
+
+### Bug Fixes
+
+* **mainsite:** rebrand logo, favicon, and social links ([#272](https://github.com/vesperp4/mono/issues/272)) ([335a263](https://github.com/vesperp4/mono/commit/335a263ef37241c75db681fabf0b194cad33871b))
+
 ## [0.5.2](https://github.com/vesperp4/mono/compare/mainsite-web-v0.5.1...mainsite-web-v0.5.2) (2026-08-12)
 
 

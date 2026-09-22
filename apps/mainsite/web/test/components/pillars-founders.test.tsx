@@ -44,7 +44,7 @@ describe('StarsFounders', () => {
     for (const founder of FOUNDERS) {
       expect(screen.getByRole('heading', {name: founder.name})).toBeInTheDocument()
       expect(
-        screen.getByRole('img', {name: `${founder.star} — ${founder.pillar}`}),
+        screen.getByRole('img', {name: `${founder.name}, ${founder.star}`}),
       ).toBeInTheDocument()
     }
   })

@@ -116,6 +116,9 @@ feat/* or fix/*  →  PR to main  →  production
 
 Full pipeline reference → [docs/cicd-pipeline.md](./docs/cicd-pipeline.md)
 
+Build failures on `main`, prod deploys and Azure alerts report to Slack →
+[docs/alerting.md](./docs/alerting.md)
+
 ---
 
 ## Content Management
