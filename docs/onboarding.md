@@ -367,6 +367,13 @@ Breaking things is part of learning. Here's how to get unstuck.
 - **CI is red on your PR.** Click "Details" next to the failing check on GitHub — it tells you
   exactly which step failed. Often it's lint or types. Reproduce it locally with
   `mise run check`, fix it, commit, and push again.
+- **CI complains about coverage after you added a component.** The mainsite test suite
+  enforces a minimum percentage of code covered by tests, so new code needs a new test.
+  Add one under `apps/mainsite/web/test/components/`, copying the nearest existing test as
+  a model.
+- **You've been stuck on the same error for 30 minutes.** Stop and post in the team
+  channel with the full error text. That is the expected move, not a last resort. See
+  [team-guide.md](./team-guide.md#5-when-you-are-stuck).
 - **Totally lost / scared you broke something.** You almost certainly didn't — `main` is
   protected. Worst case, you can throw your branch away and start over from a clean `main`.
   When in doubt, **ask the team.** Everyone here was new once.
@@ -377,6 +384,8 @@ Breaking things is part of learning. Here's how to get unstuck.
 
 You now know enough to contribute. When you're ready for more depth:
 
+- [**How this team works**](./team-guide.md) — the weekly rhythm, how to claim an issue,
+  what to expect from code review, and what to do when you're stuck. Read this one next.
 - [**Glossary**](./glossary.md) — plain-English definitions of every term and tool.
 - [**CONTRIBUTING.md**](../CONTRIBUTING.md) — full setup, devcontainer customization, branch &
   commit rules.
