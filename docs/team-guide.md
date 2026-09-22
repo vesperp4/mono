@@ -209,9 +209,10 @@ learn the codebase.
 
 ## 7. What happens after you merge
 
-Merging to `main` deploys automatically. Your change goes to the dev site, and mainsite
-changes go on to production at vesperp4.com. That is the point: your work goes live, with
-your name on the commit.
+Merging to `main` deploys automatically. The web frontends (mainsite, portal, TV) go
+straight to production; the backend services (portal API, TV engine) go to the dev
+environment first and the maintainer promotes them to production. That is the point: your
+work goes live, with your name on the commit.
 
 If something breaks after a merge, we **revert first and investigate afterwards**. A
 revert is a normal, blameless button click. It is not a punishment and it does not mean

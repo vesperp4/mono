@@ -127,8 +127,10 @@ Run these in order. Steps 1 and 2 are yours; steps 3 to 5 are theirs.
 ### Step 1: access, before they touch anything
 
 ```bash
-# Invite as an ORG MEMBER, not an outside collaborator (see section 6 for why)
-gh api -X POST orgs/vesperp4/invitations -f invitee_id=<numeric-user-id> -f role=direct_member
+# Invite as an ORG MEMBER, not an outside collaborator (see section 6 for why).
+# invitee_id must be a number: -F sends a typed value, -f would send a string and 422.
+gh api users/<github-username> --jq .id
+gh api -X POST orgs/vesperp4/invitations -F invitee_id=<numeric-user-id> -f role=direct_member
 
 # Add to the contributor team
 gh api -X PUT orgs/vesperp4/teams/fullstack/memberships/<github-username> -f role=member
@@ -294,8 +296,14 @@ gh api repos/vesperp4/mono/rulesets/14805427 \
 
 ```bash
 gh pr list --repo vesperp4/mono --state merged --limit 5   # find the culprit
-gh api -X POST repos/vesperp4/mono/pulls/<number>/... # or use the Revert button on the PR
+git switch main && git pull
+git switch -c revert/<number>
+git revert <squash-commit-sha>   # squash merges are single commits, so no -m is needed
+git push -u origin revert/<number> && gh pr create --fill
 ```
+
+The **Revert** button on the merged pull request does the same thing and opens the PR for
+you. Either way the revert PR still needs green required checks; it cannot skip them.
 
 Then say in the channel that you reverted and why, in a way that makes clear it is not a
 telling off:
