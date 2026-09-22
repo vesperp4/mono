@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/vesperp4/mono/compare/portal-api-v0.9.1...portal-api-v0.9.2) (2026-09-17)
+
+
+### Bug Fixes
+
+* **portal-api:** bump rustls 0.23.40 to 0.23.45 for RUSTSEC-2026-0285 ([#293](https://github.com/vesperp4/mono/issues/293)) ([a513f56](https://github.com/vesperp4/mono/commit/a513f56ca1c00d91097450b302dda8c36c293243))
+
 ## [0.9.1](https://github.com/vesperp4/mono/compare/portal-api-v0.9.0...portal-api-v0.9.1) (2026-09-02)
 
 
