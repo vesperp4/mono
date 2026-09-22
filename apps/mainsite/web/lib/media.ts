@@ -1,7 +1,7 @@
 // Centralized media configuration — update paths here to swap assets globally
 
 export const MEDIA = {
-  logo: "/logo.png",
+  logo: "/logo.webp",
   stars: "/stars.png",
   images: {
     ai: "/Fondo de AI eliminado.png",
@@ -14,6 +14,12 @@ export const MEDIA = {
     cyber: "/cybersecurity.mp4",
     nationalAffairs: "/nationalsecurityandaffair.mp4",
     engineering: "/engipillar.mp4",
+  },
+  founderPhotos: {
+    ai: "/founder-ai.webp",
+    cyber: "/founder-cyber.webp",
+    nationalAffairs: "/founder-national.webp",
+    engineering: "/founder-engineering.webp",
   },
 };
 
@@ -66,7 +72,7 @@ export const FOUNDERS = [
     pillar: "Artificial Intelligence",
     star: "Azure Star",
     accentColor: "#60A5FA",
-    image: MEDIA.images.ai,
+    image: MEDIA.founderPhotos.ai,
     meaning: "Guidance through computation. The Azure Star illuminates the path of emerging intelligence.",
     role: "Public Relations",
   },
@@ -75,7 +81,7 @@ export const FOUNDERS = [
     pillar: "Cybersecurity",
     star: "Crimson Star",
     accentColor: "#F87171",
-    image: MEDIA.images.cyber,
+    image: MEDIA.founderPhotos.cyber,
     meaning: "Vigilance in the digital frontier. The Crimson Star guards the edge of every system.",
     role: "President",
   },
@@ -84,7 +90,7 @@ export const FOUNDERS = [
     pillar: "National Affairs & Security",
     star: "Jade Star",
     accentColor: "#34D399",
-    image: MEDIA.images.nationalAffairs,
+    image: MEDIA.founderPhotos.nationalAffairs,
     meaning: "Strategic clarity in complex times. The Jade Star anchors policy and purpose.",
     role: "Vice President",
   },
@@ -93,7 +99,7 @@ export const FOUNDERS = [
     pillar: "Engineering",
     star: "Amethyst Star",
     accentColor: "#A78BFA",
-    image: MEDIA.images.engineering,
+    image: MEDIA.founderPhotos.engineering,
     meaning: "Building the foundations of tomorrow. The Amethyst Star powers innovation.",
     role: "Founder",
   },

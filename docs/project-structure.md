@@ -10,7 +10,8 @@ Full reference for the Vesper P4 monorepo layout.
 mono/
 ├── apps/
 │   ├── mainsite/            Public site (vesperp4.com)
-│   └── portal/              Member portal (portal.vesperp4.com) — web + api
+│   ├── portal/              Member portal (portal.vesperp4.com) — web + api
+│   └── ops/                 Operational services (alerts-relay)
 ├── packages/               Shared internal packages
 ├── docs/                   Architecture and reference docs
 ├── .github/workflows/       GitHub Actions CI/CD
@@ -155,6 +156,31 @@ export default config;
 
 ---
 
+## apps/ops/alerts-relay
+
+A Cloudflare Worker that translates Azure Monitor alerts into Slack messages.
+
+```
+apps/ops/alerts-relay/
+├── src/
+│   ├── index.ts            Fetch handler: routing, shared-token auth
+│   ├── azure.ts            Common Alert Schema -> Slack message
+│   └── slack.ts            Incoming Webhook client + Block Kit builder
+├── test/                   Vitest (no Workers pool; the logic is pure)
+├── wrangler.toml
+└── README.md
+```
+
+It exists because Azure Monitor action groups have no Slack receiver, so
+something has to translate between Azure's JSON and Slack's. GitHub Actions and
+Sanity produce Slack's format themselves and do not go through it.
+
+Not part of any app group's ownership boundary: it holds no content and no member
+data, and nothing in `mainsite`, `portal` or `tv` calls it. See
+[`docs/alerting.md`](./alerting.md).
+
+---
+
 ## Infrastructure
 
 Cloud infrastructure (Azure Container Apps, Static Web Apps, PostgreSQL, etc.) is
@@ -174,3 +200,4 @@ identity & access is documented here in [`docs/entra-identity.md`](./entra-ident
 | `project-structure.md` | This file |
 | `cicd-pipeline.md` | CI/CD pipeline reference |
 | `infra-repo-spec.md` | Historical scaffold spec for the infra repo |
+| `alerting.md` | What alerts exist, where they go, and how to set them up |
