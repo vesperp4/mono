@@ -44,9 +44,9 @@ export default function StarFounderCard({
         >
           <Image
             src={image}
-            alt={`${star} — ${pillar}`}
+            alt={`${name}, ${star}`}
             fill
-            className="object-contain p-8"
+            className="object-cover"
           />
         </motion.div>
 
