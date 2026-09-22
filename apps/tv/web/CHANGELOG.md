@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/vesperp4/mono/compare/tv-web-v0.4.0...tv-web-v0.4.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* **tv-web:** bound and handle the Sanity schedule fetch ([#265](https://github.com/vesperp4/mono/issues/265)) ([2f8b6d6](https://github.com/vesperp4/mono/commit/2f8b6d67f0ec2c0402af3a97dc8bd757d86c9237))
+
 ## [0.4.0](https://github.com/vesperp4/mono/compare/tv-web-v0.3.1...tv-web-v0.4.0) (2026-08-12)
 
 
