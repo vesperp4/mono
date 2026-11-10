@@ -95,4 +95,5 @@ jobs:
           image-ref: ${{ inputs.package }}:scan
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          trivyignores: ${{ inputs.working-directory }}/.trivyignore
           exit-code: "1"
