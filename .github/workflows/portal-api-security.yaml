@@ -93,6 +93,7 @@ jobs:
           ignore-unfixed: true
           trivyignores: apps/portal/api/.trivyignore
           exit-code: "1"
+          limit-severities-for-sarif: true
           format: sarif
           output: trivy-portal-api.sarif
 
