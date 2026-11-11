@@ -1,0 +1,2 @@
+# Unused by the binary (rustls/aws-lc-rs, no OpenSSL). Remove once distroless cc-debian12 ships libssl3 >= 3.0.22.
+CVE-2026-84782 exp:2026-12-01
